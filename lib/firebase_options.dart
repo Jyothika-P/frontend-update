@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -49,7 +46,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '632155284263',
     projectId: 'psychesail-c94c2',
     authDomain: 'psychesail-c94c2.firebaseapp.com',
-    storageBucket: 'psychesail-c94c2.appspot.com',
+    databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
+    storageBucket: 'psychesail-c94c2.firebasestorage.app',
     measurementId: 'G-KFQNEEK4WK',
   );
 
@@ -58,7 +56,8 @@ class DefaultFirebaseOptions {
     appId: '1:632155284263:android:e75468971b9f64fa257f02',
     messagingSenderId: '632155284263',
     projectId: 'psychesail-c94c2',
-    storageBucket: 'psychesail-c94c2.appspot.com',
+    databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
+    storageBucket: 'psychesail-c94c2.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -66,7 +65,10 @@ class DefaultFirebaseOptions {
     appId: '1:632155284263:ios:2ff36273883559ad257f02',
     messagingSenderId: '632155284263',
     projectId: 'psychesail-c94c2',
-    storageBucket: 'psychesail-c94c2.appspot.com',
+    databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
+    storageBucket: 'psychesail-c94c2.firebasestorage.app',
+    androidClientId: '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
+    iosClientId: '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
     iosBundleId: 'com.example.frontend',
   );
 
@@ -75,7 +77,22 @@ class DefaultFirebaseOptions {
     appId: '1:632155284263:ios:2ff36273883559ad257f02',
     messagingSenderId: '632155284263',
     projectId: 'psychesail-c94c2',
-    storageBucket: 'psychesail-c94c2.appspot.com',
+    databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
+    storageBucket: 'psychesail-c94c2.firebasestorage.app',
+    androidClientId: '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
+    iosClientId: '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
     iosBundleId: 'com.example.frontend',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBuDgaeQpspMGJIHFbQsfv0PbfnW3OfKRs',
+    appId: '1:632155284263:web:edcf854ca2ce5968257f02',
+    messagingSenderId: '632155284263',
+    projectId: 'psychesail-c94c2',
+    authDomain: 'psychesail-c94c2.firebaseapp.com',
+    databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
+    storageBucket: 'psychesail-c94c2.firebasestorage.app',
+    measurementId: 'G-6ZVL6WCGLS',
+  );
+
 }

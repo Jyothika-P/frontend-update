@@ -8,7 +8,8 @@ import 'package:psychesail/model/emoji.dart';
 import 'package:psychesail/pages/join_room.dart';
 import 'package:psychesail/pages/room_screen.dart';
 
-Widget communityscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
+Widget communityscroll(
+    sizeWidth, sizeHeight, constr, title, arr, currentid, context) {
   print(arr);
   print(currentid);
   return Wrap(
@@ -37,7 +38,7 @@ Widget communityscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,conte
           reverse: false,
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
-          itemCount: arr.length-1,
+          itemCount: arr.length - 1,
           itemBuilder: (context, index) {
             return communityContainer(
                 sizeWidth,
@@ -46,8 +47,8 @@ Widget communityscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,conte
                 arr[arr.length - 2 - index].id,
                 arr[arr.length - 2 - index]['description'],
                 arr[arr.length - 2 - index]['url'],
-            currentid,
-            context);
+                currentid,
+                context);
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),
@@ -58,7 +59,8 @@ Widget communityscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,conte
   );
 }
 
-Widget youtubescroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
+Widget youtubescroll(
+    sizeWidth, sizeHeight, constr, title, arr, currentid, context) {
   print(arr);
   print(currentid);
   return Wrap(
@@ -83,25 +85,23 @@ Widget youtubescroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context
       ),
       Container(
         constraints: BoxConstraints(
-                                                        maxHeight: sizeHeight * 0.5,
-
-                                              ),
+          maxHeight: sizeHeight * 0.5,
+        ),
         child: ListView.separated(
           reverse: false,
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           itemCount: arr.length,
           itemBuilder: (context, index) {
-      return youtubeContainer(
-        sizeWidth,
-        sizeHeight,
-        constr,
-        arr[arr.length - 1 - index].title,
-        arr[arr.length - 1 - index].views,
-        arr[arr.length - 1 - index].thumbnails.first.url,
-        arr[arr.length - 1 - index].videoId,
-      );
-    
+            return youtubeContainer(
+              sizeWidth,
+              sizeHeight,
+              constr,
+              arr[arr.length - 1 - index].title,
+              arr[arr.length - 1 - index].views,
+              arr[arr.length - 1 - index].thumbnails.first.url,
+              arr[arr.length - 1 - index].videoId,
+            );
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),
@@ -111,7 +111,9 @@ Widget youtubescroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context
     ],
   );
 }
-Widget bookscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
+
+Widget bookscroll(
+    sizeWidth, sizeHeight, constr, title, arr, currentid, context) {
   print(arr);
   print(currentid);
   return Wrap(
@@ -124,11 +126,15 @@ Widget bookscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
           Text(
             title,
             style: TextStyle(
-                color: Colors.white,
-                fontSize: sizeWidth * sizeHeight * 0.000067,
-                fontWeight: FontWeight.bold,),
+              color: Colors.white,
+              fontSize: sizeWidth * sizeHeight * 0.000067,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          Text("See All", style: TextStyle(color: Colors.white,)),
+          Text("See All",
+              style: TextStyle(
+                color: Colors.white,
+              )),
         ],
       ),
       SizedBox(
@@ -136,26 +142,24 @@ Widget bookscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
       ),
       Container(
         constraints: BoxConstraints(
-                                                        maxHeight: sizeHeight * 0.5,
-
-                                              ),
+          maxHeight: sizeHeight * 0.5,
+        ),
         child: ListView.separated(
           reverse: false,
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           itemCount: arr.length,
           itemBuilder: (context, index) {
-            
-      return bookContainer(
-        sizeWidth,
-        sizeHeight,
-        constr,
-        arr[arr.length - 1 - index].volumeInfo.title,
-        arr[arr.length - 1 - index].volumeInfo.description,
-        arr[arr.length - 1 - index].volumeInfo.imageLinks.entries.first.value,
-        arr[arr.length - 1 - index].volumeInfo.previewLink
-      );
-    
+            return bookContainer(
+                sizeWidth,
+                sizeHeight,
+                constr,
+                arr[arr.length - 1 - index].title,
+                arr[arr.length - 1 - index].description,
+                arr[arr.length - 1 - index].imageLinks.isNotEmpty
+                    ? arr[arr.length - 1 - index].imageLinks.first.url
+                    : '',
+                '');
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),
@@ -166,15 +170,13 @@ Widget bookscroll(sizeWidth, sizeHeight, constr, title, arr,currentid,context) {
   );
 }
 
-Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr,user) {
+Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr, user) {
   return Wrap(
     spacing: 20,
     runSpacing: min(20, sizeWidth * 0.0006),
-
     children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
         children: [
           Text(
             title,
@@ -202,17 +204,14 @@ Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr,user) {
                 context,
                 MaterialPageRoute(
                   builder: (context) => RoomScreen(
-                    roomId: arr[arr.length - 1 - index][1],
-                    token: token,
-                    leaveRoom: () => {},
-                    currentId: user,
-                     userId : arr[arr.length - 1 - index][0]
-                   ),
-                ),),
-              child: callingContainer(
-                  sizeWidth,
-                  sizeHeight,
-                  constr,
+                      roomId: arr[arr.length - 1 - index][1],
+                      token: token,
+                      leaveRoom: () => {},
+                      currentId: user,
+                      userId: arr[arr.length - 1 - index][0]),
+                ),
+              ),
+              child: callingContainer(sizeWidth, sizeHeight, constr,
                   arr[arr.length - 1 - index][0]),
             );
           },
@@ -225,7 +224,8 @@ Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr,user) {
   );
 }
 
-Widget  activityscroll(context,sizeWidth, sizeHeight, constr, title, arr, pos,currentUserId,place) {
+Widget activityscroll(context, sizeWidth, sizeHeight, constr, title, arr, pos,
+    currentUserId, place) {
   print(pos);
 
   return Wrap(
@@ -264,17 +264,17 @@ Widget  activityscroll(context,sizeWidth, sizeHeight, constr, title, arr, pos,cu
                 arr[arr.length - 1 - index].id,
                 arr[arr.length - 1 - index]['url'],
                 pos,
-                currentUserId,place);
+                currentUserId,
+                place);
           },
           separatorBuilder: ((context, index) => SizedBox(
-            width: min(sizeWidth * 0.05, 30),
-          )),
+                width: min(sizeWidth * 0.05, 30),
+              )),
         ),
       )
     ],
   );
 }
-
 
 Widget historyscroll(
     sizeWidth, sizeHeight, constr, title, arr, context, currentUser) {
@@ -313,8 +313,22 @@ Widget historyscroll(
           shrinkWrap: true,
           itemCount: arr.length,
           itemBuilder: (context, index) {
-            return (arr[index].length == 0) ? Container(width: sizeWidth ,child: Center(child: Text("Start Journey with Serenity....",style: TextStyle(color: Colors.black),))): historyContainer(sizeWidth, sizeHeight, true, arr[index][0],
-                arr[index][1], stressEmoji.stressEmoji((index + 1).toString()),false);
+            return (arr[index].length == 0)
+                ? Container(
+                    width: sizeWidth,
+                    child: Center(
+                        child: Text(
+                      "Start Journey with Serenity....",
+                      style: TextStyle(color: Colors.black),
+                    )))
+                : historyContainer(
+                    sizeWidth,
+                    sizeHeight,
+                    true,
+                    arr[index][0],
+                    arr[index][1],
+                    stressEmoji.stressEmoji((index + 1).toString()),
+                    false);
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),

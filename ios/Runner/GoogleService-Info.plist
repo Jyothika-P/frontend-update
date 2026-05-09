@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.632155284263-o48e1kes6q54utshp0sv94qbegbn1mau</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCmMfORufMBOYCnRRJKCd4pCGaWXwSUT_A</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +19,7 @@
 	<key>PROJECT_ID</key>
 	<string>psychesail-c94c2</string>
 	<key>STORAGE_BUCKET</key>
-	<string>psychesail-c94c2.appspot.com</string>
+	<string>psychesail-c94c2.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -26,5 +32,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:632155284263:ios:2ff36273883559ad257f02</string>
+	<key>DATABASE_URL</key>
+	<string>https://psychesail-c94c2-default-rtdb.firebaseio.com</string>
 </dict>
 </plist>

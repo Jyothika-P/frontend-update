@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../components/text.dart';
@@ -207,12 +206,14 @@ class _LoginState extends State<Login> {
 
                                       if (position != null) {
                                         // Ensure position is available before navigating
-                                        Navigator.pushNamed(context, '/home', arguments: {
-                                          'currentuser': currentuser,
-                                          'position': position,
-                                        });
+                                        Navigator.pushNamed(context, '/home',
+                                            arguments: {
+                                              'currentuser': currentuser,
+                                              'position': position,
+                                            });
                                       } else {
-                                        print("Position is null"); // Debugging statement
+                                        print(
+                                            "Position is null"); // Debugging statement
                                         // Handle the case where position is null
                                       }
                                     }
@@ -323,11 +324,11 @@ class _LoginState extends State<Login> {
                                     if (check == 'userExists') {
                                       position = await _determinePosition();
                                       print(position);
-                                    //   Navigator.pushNamed(context, '/home',
-                                    //       arguments: {
-                                    //         'currentuser': nameController.text,
-                                    //         'position': position
-                                    //       });
+                                      //   Navigator.pushNamed(context, '/home',
+                                      //       arguments: {
+                                      //         'currentuser': nameController.text,
+                                      //         'position': position
+                                      //       });
                                     }
                                   }
                                 },
@@ -380,8 +381,10 @@ class _LoginState extends State<Login> {
                                       Navigator.pushNamed(context, '/home',
                                           arguments: {
                                             'currentuser': nameController.text,
-                                            'positionLong': position.toJson()['longitude'],
-                                            'positionLat' : position.toJson()['latitude']
+                                            'positionLong':
+                                                position.toJson()['longitude'],
+                                            'positionLat':
+                                                position.toJson()['latitude']
                                           });
                                     }
                                   }
@@ -392,7 +395,7 @@ class _LoginState extends State<Login> {
                                     sizeWidth / 50,
                                     sizeHeight / 50,
                                     "Log in",
-                                    Color.fromRGBO(35, 154, 139, 75),
+                                    Color.fromRGBO(38, 166, 149, 1),
                                     Colors.white)),
                           ),
                           Padding(

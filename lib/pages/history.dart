@@ -42,27 +42,15 @@ class _ProgressState extends State<Progress> {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args =
-    ModalRoute
-        .of(context)!
-        .settings
-        .arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
     // Access individual parameters
     var currentUserId = args?['currentuser'] ?? "";
     var data = args?['historycollection'] ?? "";
 
-
-
-    double sizeHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    double sizeWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    DocumentReference userdoc = _firestore.collection('customers').doc(currentUserId);
-
-
+    double sizeHeight = MediaQuery.of(context).size.height;
+    double sizeWidth = MediaQuery.of(context).size.width;
+    DocumentReference userdoc =
+        _firestore.collection('customers').doc(currentUserId);
 
     return Scaffold(
         backgroundColor: Colors.black,
@@ -106,12 +94,12 @@ class _ProgressState extends State<Progress> {
                     children: [
                       Padding(
                         padding:
-                        EdgeInsets.all(sizeWidth * sizeHeight * 0.00002),
+                            EdgeInsets.all(sizeWidth * sizeHeight * 0.00002),
                         child: Text("History"),
                       ),
                       Padding(
                         padding:
-                        EdgeInsets.all(sizeWidth * sizeHeight * 0.00002),
+                            EdgeInsets.all(sizeWidth * sizeHeight * 0.00002),
                         child: Text("Progress"),
                       ),
                     ]),
@@ -140,12 +128,17 @@ class _ProgressState extends State<Progress> {
         shrinkWrap: true,
         itemCount: data.length,
         itemBuilder: (context, index) {
-          return historyContainer(sizeWidth, sizeHeight, false,data[index][0],
-              data[index][1] , stressEmoji.stressEmoji((data[index][2]).toString()),true);
+          return historyContainer(
+              sizeWidth,
+              sizeHeight,
+              false,
+              data[index][0],
+              data[index][1],
+              stressEmoji.stressEmoji((data[index][2]).toString()),
+              true);
         },
-        separatorBuilder: ((context, index) =>
-            SizedBox(
-              height: min(sizeHeight * 0.05, 30),
+        separatorBuilder: ((context, index) => SizedBox(
+              height: min(sizeHeight * 0.015, 30),
             )),
       );
     else
@@ -153,45 +146,56 @@ class _ProgressState extends State<Progress> {
         backgroundColor: Colors.white,
         body: Padding(
           padding: const EdgeInsets.all(0.8),
-          child: Column( children: [Padding(
-            padding: const EdgeInsets.only(top : 10.0, bottom: 30.0),
-            child: ToggleButtons(
-            constraints: BoxConstraints(minWidth: sizeWidth * 0.45),
-              color: Colors.black,
-              selectedColor: Color.fromRGBO(35, 154, 139, 100),
-              fillColor: Colors.green.shade900.withOpacity(0.3),
-              borderColor: Colors.black45,
-              selectedBorderColor: Colors.black45,
-              borderWidth: 2,
-              borderRadius: BorderRadius.circular(20.0),
-              onPressed: (int index) {
-                setState(() {
-                  isSelectedWeekly[index] = true;
-                  isSelectedWeekly[(index - 1).abs()] = false;
-                });
-              },
-              isSelected: isSelectedWeekly,
-              children: [
-                Padding(
-                  padding:
-                  EdgeInsets.all(sizeWidth * sizeHeight * 0.00004),
-                  child: Text("Weekly"),
-                ),
-                Padding(
-                  padding:
-                  EdgeInsets.all(sizeWidth * sizeHeight * 0.00004),
-                  child: Text("Monthly"),
-                ),
-              ]),
-          )
-            ,_buildUI(sizeHeight, sizeWidth, isSelectedWeekly,data)],),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 30.0),
+                child: ToggleButtons(
+                    constraints: BoxConstraints(minWidth: sizeWidth * 0.45),
+                    color: Colors.black,
+                    selectedColor: Color.fromRGBO(35, 154, 139, 100),
+                    fillColor: Colors.green.shade900.withOpacity(0.3),
+                    borderColor: Colors.black45,
+                    selectedBorderColor: Colors.black45,
+                    borderWidth: 2,
+                    borderRadius: BorderRadius.circular(20.0),
+                    onPressed: (int index) {
+                      setState(() {
+                        isSelectedWeekly[index] = true;
+                        isSelectedWeekly[(index - 1).abs()] = false;
+                      });
+                    },
+                    isSelected: isSelectedWeekly,
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsets.all(sizeWidth * sizeHeight * 0.00004),
+                        child: Text("Weekly"),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.all(sizeWidth * sizeHeight * 0.00004),
+                        child: Text("Monthly"),
+                      ),
+                    ]),
+              ),
+              _buildUI(sizeHeight, sizeWidth, isSelectedWeekly, data)
+            ],
+          ),
         ),
       );
   }
 
-
   List<FlSpot> weeklySpots(List<List<dynamic>> stressHistory) {
-    var daysOfWeek = {"Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7};
+    var daysOfWeek = {
+      "Monday": 1,
+      "Tuesday": 2,
+      "Wednesday": 3,
+      "Thursday": 4,
+      "Friday": 5,
+      "Saturday": 6,
+      "Sunday": 7
+    };
     DateTime now = DateTime.now();
     int currentWeekOfYear = weekOfYear(now);
     int currentYear = now.year;
@@ -200,7 +204,8 @@ class _ProgressState extends State<Progress> {
     for (var entry in stressHistory) {
       DateFormat format = DateFormat("EEEE ,d MMMM yyyy");
       DateTime entryDate = format.parse(entry[0]);
-      if (weekOfYear(entryDate) == currentWeekOfYear && entryDate.year == currentYear) {
+      if (weekOfYear(entryDate) == currentWeekOfYear &&
+          entryDate.year == currentYear) {
         String dayKey = DateFormat('EEEE').format(entryDate);
         double stressValue = double.parse(entry[2].toString());
         if (!groupedByDay.containsKey(dayKey)) {
@@ -251,38 +256,41 @@ class _ProgressState extends State<Progress> {
       double averageStress = values.reduce((a, b) => a + b) / values.length;
       spots.add(FlSpot(mon.toDouble(), averageStress));
     });
-print(spots);
-spots.sort((a,b) => a.x.compareTo(b.x));
+    print(spots);
+    spots.sort((a, b) => a.x.compareTo(b.x));
     print(spots);
     return spots;
   }
-  
-  
-  Widget _buildUI(sizeHeight, sizeWidth, isSelectedWeekly,data) {
-    var check = isSelectedWeekly[0]?true:false;
+
+  Widget _buildUI(sizeHeight, sizeWidth, isSelectedWeekly, data) {
+    var check = isSelectedWeekly[0] ? true : false;
     return Center(
       child: SizedBox(
         width: sizeWidth,
-        height: sizeHeight/2,
+        height: sizeHeight / 2,
         child: Container(
           color: Colors.black,
-          padding: EdgeInsets.symmetric(horizontal: sizeHeight/50, vertical: sizeWidth/25), // Add some padding
+          padding: EdgeInsets.symmetric(
+              horizontal: sizeHeight / 50,
+              vertical: sizeWidth / 25), // Add some padding
           child: LineChart(
             LineChartData(
-              gridData: FlGridData(show: true,
-                drawHorizontalLine:(check)? true:false,
-                drawVerticalLine: (check)?false:true,
+              gridData: FlGridData(
+                show: true,
+                drawHorizontalLine: (check) ? true : false,
+                drawVerticalLine: (check) ? false : true,
               ),
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (double value, TitleMeta meta) {
-                      if(value.toInt() == 0.0) {
+                      if (value.toInt() == 0.0) {
                         return SizedBox.shrink();
                       }
                       return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: sizeHeight/200),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20.0, horizontal: sizeHeight / 200),
                         child: Text(
                           '${value.toInt()}',
                           style: TextStyle(
@@ -304,7 +312,7 @@ spots.sort((a,b) => a.x.compareTo(b.x));
                 topTitles: AxisTitles(
                   sideTitles: SideTitles(showTitles: false),
                 ),
-               bottomTitles: AxisTitles(
+                bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (double value, TitleMeta meta) {
@@ -337,11 +345,13 @@ spots.sort((a,b) => a.x.compareTo(b.x));
                         }
                         return Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: Text(title, style: TextStyle(
-                              color: Colors.white, fontFamily: "ABeeZee"),),
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                                color: Colors.white, fontFamily: "ABeeZee"),
+                          ),
                         );
-                      }
-                      else {
+                      } else {
                         switch (value.toInt()) {
                           case 1:
                             title = 'Jan';
@@ -384,25 +394,34 @@ spots.sort((a,b) => a.x.compareTo(b.x));
                         }
                         return Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: Text(title, style: TextStyle(
-                              color: Colors.white, fontFamily: "ABeeZee", fontSize: 10),),
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "ABeeZee",
+                                fontSize: 10),
+                          ),
                         );
                       }
                     },
                     reservedSize: 30,
-                    interval: 1,// Adjust the size reserved for the bottom titles if necessary
+                    interval:
+                        1, // Adjust the size reserved for the bottom titles if necessary
                   ),
                 ),
               ),
-              borderData: FlBorderData(border: Border(top: BorderSide.none,
+              borderData: FlBorderData(
+                  border: Border(
+                top: BorderSide.none,
                 right: BorderSide.none,
                 left: BorderSide.none,
                 // left: BorderSide(color: Colors.black45, width: 2.0),
-                bottom: BorderSide(color: Colors.white60, width: 3.0),)),
+                bottom: BorderSide(color: Colors.white60, width: 3.0),
+              )),
 
               minX: 0,
               // Minimum value on the x-axis
-              maxX: (check)?7:12,
+              maxX: (check) ? 7 : 12,
               // Maximum value on the x-axis
               minY: 0,
               // Minimum value on the y-axis
@@ -415,7 +434,8 @@ spots.sort((a,b) => a.x.compareTo(b.x));
                   color: Color.fromRGBO(10, 149, 120, 90),
                   barWidth: 4,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(show: true,
+                  dotData: FlDotData(
+                    show: true,
                     getDotPainter: (spot, percent, barData, index) {
                       return FlDotCirclePainter(
                         radius: 7.5,
@@ -423,7 +443,8 @@ spots.sort((a,b) => a.x.compareTo(b.x));
                         strokeWidth: 6,
                         strokeColor: Colors.transparent,
                       );
-                    },),
+                    },
+                  ),
                   belowBarData: BarAreaData(
                     show: true,
                     color: Color.fromRGBO(20, 139, 120, 100),
@@ -436,16 +457,15 @@ spots.sort((a,b) => a.x.compareTo(b.x));
       ),
     );
   }
+
   Color _getDotColor(double yValue) {
     if (yValue <= 1 && yValue > 0) {
       return Colors.green.shade800; // Low values
     } else if (yValue > 1 && yValue <= 2) {
       return Colors.green.shade400; // Medium values
-    }
-    else if (yValue <= 3 && yValue > 2) {
+    } else if (yValue <= 3 && yValue > 2) {
       return Colors.orange.shade300;
-    }
-    else if (yValue > 3 && yValue <= 4) {
+    } else if (yValue > 3 && yValue <= 4) {
       return Colors.orange.shade800;
     } else {
       return Colors.red; // High values

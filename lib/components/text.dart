@@ -10,6 +10,7 @@ import 'package:random_avatar/random_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './button.dart';
 import 'package:animations/animations.dart';
+
 Widget HigthlightText(fontsize, minheight, txt) {
   return Container(
     constraints: BoxConstraints(
@@ -288,7 +289,8 @@ Widget _maptextbubble(size) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  constraints: BoxConstraints(minHeight: size.height/3 , minWidth: size.width/4),
+                  constraints: BoxConstraints(
+                      minHeight: size.height / 3, minWidth: size.width / 4),
                   decoration: BoxDecoration(
                       image: DecorationImage(
                     image: AssetImage("assets/maps_image.png"),
@@ -315,7 +317,8 @@ Widget _maptextbubble(size) {
   );
 }
 
-Widget communityContainer(sizeWidth,sizeHeight,constr,heading,description,imagestring,currentid,context) {
+Widget communityContainer(sizeWidth, sizeHeight, constr, heading, description,
+    imagestring, currentid, context) {
   print("inside container");
   print(currentid);
   // decoration: BoxDecoration(
@@ -333,185 +336,190 @@ Widget communityContainer(sizeWidth,sizeHeight,constr,heading,description,images
   // ),
   return InkWell(
     onTap: () {
-      Navigator.pushNamed(context, '/chatroom', arguments:{'currentid': currentid,
+      Navigator.pushNamed(context, '/chatroom', arguments: {
+        'currentid': currentid,
         'receiverid': 'Disha',
-        'communityname' : heading, });
+        'communityname': heading,
+      });
     },
     child: Container(
-                                                constraints: BoxConstraints(
-                                                  maxWidth: sizeWidth * 0.5
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(0.9) ,
-                                                  border: Border.all(
-                                                    color: Colors.grey.shade300,
-                                                  ),
-                                                    boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.grey.withOpacity(0.5)  , // Greyish color with opacity
-                                                      spreadRadius: 3, // Controls how far the shadow spreads
-                                                      blurRadius: 3, // Controls the blurriness of the shadow
-                                                      offset: Offset(0, 0), // Controls the position of the shadow
-                                                    ),
-                                                  ],
-                                                  borderRadius: BorderRadius.all(Radius.circular(8.0))
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
-                                                  child: Column(
-                                                    children: [
-                                                      circleButton(
-                                                                constr, sizeWidth / 100, sizeWidth / 50, imagestring),
-                                                                Text(heading,style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: sizeWidth * sizeHeight * 0.00008,
-                                                      fontWeight: FontWeight.bold
-                                                    ),),
-                                                    Text(description,style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: sizeWidth * sizeHeight * 0.00005,
-
-                                                    ),
-                                                    textAlign: TextAlign.center,)
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
+      constraints: BoxConstraints(maxWidth: sizeWidth * 0.5),
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5), // Greyish color with opacity
+              spreadRadius: 3, // Controls how far the shadow spreads
+              blurRadius: 3, // Controls the blurriness of the shadow
+              offset: Offset(0, 0), // Controls the position of the shadow
+            ),
+          ],
+          borderRadius: BorderRadius.all(Radius.circular(8.0))),
+      child: Padding(
+        padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
+        child: Column(
+          children: [
+            circleButton(constr, sizeWidth / 100, sizeWidth / 50, imagestring),
+            Text(
+              heading,
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: sizeWidth * sizeHeight * 0.00008,
+                  fontWeight: FontWeight.bold),
+            ),
+            Text(
+              description,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: sizeWidth * sizeHeight * 0.00005,
+              ),
+              textAlign: TextAlign.center,
+            )
+          ],
+        ),
+      ),
+    ),
   );
 }
-Widget bookContainer(sizeWidth,sizeHeight,constr,heading,description,imagestring,previewstring) {
+
+Widget bookContainer(sizeWidth, sizeHeight, constr, heading, description,
+    imagestring, previewstring) {
   print("inside container");
   print(description.length);
   return Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth: sizeWidth *0.95
-                                              ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0))
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
-                                                child: Center(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      
-                                                                Row(
-                                                                  children: [
-                                                                    Container(
-                                                                                                                          height: sizeHeight * 0.3,
-                                                                                                                          child: Image.network(
-                                                                                                                                      imagestring.toString(),
-                                                                                                                                      fit: BoxFit.cover, // Adjust the fit as needed
-                                                                                                                                    ),
-                                                                                                                        ),
-                                                                                                                        SizedBox(width: min(12,sizeWidth*0.05),),
-                                                                    Expanded(
-                                                                      child: Column(
-                                                                        children: [
-                                                                          Text(heading,textAlign:TextAlign.center,style: TextStyle(
-                                                                                                                                color: Colors.white,
-                                                                                                                                fontSize: sizeWidth * sizeHeight * 0.00008,
-                                                                                                                                fontWeight: FontWeight.bold
-                                                                                                                              ),
-                                                                                                                              softWrap: true),
-                                                                                                                              SizedBox(height: min(12,sizeHeight*0.05),),
-                                                                          Text(description,style: TextStyle(
-                                                                                                                            color: Colors.white,
-                                                                                                                            fontSize: sizeWidth * sizeHeight * 0.00005,
-
-                                                                                                                          ),
-                                                                                                                          textAlign: TextAlign.center,),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                                                                        
-                                                                  ],
-                                                                ),
-                                                    SizedBox(height: min(12,sizeHeight*0.05),),
-                                                    InkWell(
-          onTap:() => _launchUrl(previewstring),
-        child: Text(
-          'Preview the recommended book',
-          style: TextStyle(
-            color: Colors.blue,
-            decoration: TextDecoration.underline,
-          ),
-        )
-        )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
+    constraints: BoxConstraints(maxWidth: sizeWidth * 0.95),
+    decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+    child: Padding(
+      padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: sizeHeight * 0.3,
+                  child: Image.network(
+                    imagestring.toString(),
+                    fit: BoxFit.cover, // Adjust the fit as needed
+                  ),
+                ),
+                SizedBox(
+                  width: min(12, sizeWidth * 0.05),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(heading,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeWidth * sizeHeight * 0.00007,
+                              fontWeight: FontWeight.bold),
+                          softWrap: true),
+                      SizedBox(
+                        height: min(12, sizeHeight * 0.05),
+                      ),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: sizeWidth * sizeHeight * 0.00002,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: min(12, sizeHeight * 0.05),
+            ),
+            InkWell(
+                onTap: () => _launchUrl(previewstring),
+                child: Text(
+                  'Preview the recommended book',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ))
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
-Widget callingContainer(sizeWidth,sizeHeight,constr,user) {
+Widget callingContainer(sizeWidth, sizeHeight, constr, user) {
   List<String> callQuote = [
-  "Answer with kindness.",
-  "Speak with purpose.",
-  "Listen to understand.",
-  "Communicate with empathy.",
-  "Connect through words."
-];
-Random random = Random();
+    "Answer with kindness.",
+    "Speak with purpose.",
+    "Listen to understand.",
+    "Communicate with empathy.",
+    "Connect through words."
+  ];
+  Random random = Random();
   return Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth: sizeWidth * 0.5
-                                              ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0))
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                    Icon(Icons.call,color: Color.fromRGBO(35, 154, 139, 75)),
-                                                    SizedBox(width: sizeWidth * 0.01),
-                                                    Text("Calling ...",style: TextStyle(
-                                                    color: Color.fromRGBO(35, 154, 139, 75),
-                                                    fontSize:          sizeWidth * sizeHeight * 0.00005,
-                                                    fontWeight: FontWeight.bold
-                                                    
-                                                  ),)
-                                                  ],),
-                                                    RandomAvatar(
-                                                                    user,
-                                                                      trBackground:
-                                                                          false,
-                                                                      height:
-                                                                          50,
-                                                                      width: 50),
-                                                              Text(user,style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: sizeWidth * sizeHeight * 0.00008,
-                                                    fontWeight: FontWeight.bold
-                                                  ),),
-                                                  Text(callQuote[random.nextInt(callQuote.length)],style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: sizeWidth * sizeHeight * 0.00005,
-                                                    
-                                                  ),
-                                                  textAlign: TextAlign.center,),
-                                                  
-                                                  ],
-                                                ),
-                                              ),
-                                            );
+    constraints: BoxConstraints(maxWidth: sizeWidth * 0.5),
+    decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+    child: Padding(
+      padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.call, color: Color.fromRGBO(35, 154, 139, 75)),
+              SizedBox(width: sizeWidth * 0.01),
+              Text(
+                "Calling ...",
+                style: TextStyle(
+                    color: Color.fromRGBO(35, 154, 139, 75),
+                    fontSize: sizeWidth * sizeHeight * 0.00005,
+                    fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+          RandomAvatar(user, trBackground: false, height: 50, width: 50),
+          Text(
+            user,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: sizeWidth * sizeHeight * 0.00008,
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            callQuote[random.nextInt(callQuote.length)],
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: sizeWidth * sizeHeight * 0.00005,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
 }
-Widget activityContainer(context,sizeWidth, sizeHeight, constr, heading, imagestring , pos,currentUserId,Places place) {
+
+Widget activityContainer(context, sizeWidth, sizeHeight, constr, heading,
+    imagestring, pos, currentUserId, Places place) {
   print(pos);
-  var response ;
+  var response;
 
   return GestureDetector(
     onTap: () async {
@@ -524,12 +532,11 @@ Widget activityContainer(context,sizeWidth, sizeHeight, constr, heading, imagest
       place.setObject(response);
       place.setremove(true);
       print(place.getObject());
-
     },
     child: Container(
       constraints: BoxConstraints(maxWidth: sizeWidth * 0.5),
       decoration:
-      BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.0))),
       child: Padding(
         padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
         child: Column(
@@ -549,73 +556,74 @@ Widget activityContainer(context,sizeWidth, sizeHeight, constr, heading, imagest
   );
 }
 
-Widget historyContainer(sizeWidth,sizeHeight,constr,date,time,stressEmoji,seeall) {
+Widget historyContainer(
+    sizeWidth, sizeHeight, constr, date, time, stressEmoji, seeall) {
   return Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: sizeWidth * 0.7,
-                                                maxWidth: sizeWidth
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color:  Colors.white,
-                                                border: Border.all(
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                                              ),
-
-                                              child: Padding(
-                                                padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.start, 
-                                                  children: [
-                                                    
-                                                     SizedBox.fromSize(
-                                                      size: Size.fromHeight(sizeHeight * 0.08),
-                                                       child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Column(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                                                                          crossAxisAlignment: CrossAxisAlignment.start, 
-                                                              children: [
-                                                                Row(
-                                                                  mainAxisAlignment: MainAxisAlignment.start,children: [ 
-                                                                  Icon(Icons.calendar_month_rounded,color: Color.fromRGBO(35, 154, 139, 75)),
-                                                                   SizedBox(width: sizeWidth * 0.02),
-                                                                  Text(date,style: TextStyle(
-                                                                color: Colors.black,
-                                                                fontSize: sizeWidth * sizeHeight * 0.000055,
-                                                                fontWeight: FontWeight.bold
-                                                                                                                  ),)
-                                                                ],),
-                                                                SizedBox(height: sizeHeight * 0.01),
-                                                             Row(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [ 
-                                                              Icon(Icons.schedule,color: Color.fromRGBO(35, 154, 139, 75)),
-                                                              SizedBox(width: sizeWidth * 0.02),
-                                                              Text(time,style: TextStyle(
-                                                            color:Colors.black,
-                                                            fontSize: sizeWidth * sizeHeight * 0.000055,
-                                                            
-                                                                                                              ),)
-                                                            ],),
-                                                            
-                                                              ],
-                                                            ),
-                                                       
-                                                            circleButton(
-                                                                  constr, sizeWidth / 100, sizeWidth / 50, stressEmoji[0]),
-                                                          ],
-                                                        ),
-                                                     ),
-                                                    
-                                                    
-                                                    SizedBox(height: sizeHeight * 0.01),
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                children: [
+    constraints: BoxConstraints(minWidth: sizeWidth * 0.7, maxWidth: sizeWidth),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(
+        color: Colors.grey.shade300,
+      ),
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox.fromSize(
+            size: Size.fromHeight(sizeHeight * 0.08),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.calendar_month_rounded,
+                            color: Color.fromRGBO(35, 154, 139, 75)),
+                        SizedBox(width: sizeWidth * 0.02),
+                        Text(
+                          date,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: sizeWidth * sizeHeight * 0.000045,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: sizeHeight * 0.01),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.schedule,
+                            color: Color.fromRGBO(35, 154, 139, 75)),
+                        SizedBox(width: sizeWidth * 0.02),
+                        Text(
+                          time,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: sizeWidth * sizeHeight * 0.000045,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                circleButton(
+                    constr, sizeWidth / 100, sizeWidth / 50, stressEmoji[0]),
+              ],
+            ),
+          ),
+          SizedBox(height: sizeHeight * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
               SizedBox(width: sizeWidth * 0.15),
               AnimatedContainer(
                 duration: Duration(milliseconds: 5000),
@@ -629,28 +637,31 @@ Widget historyContainer(sizeWidth,sizeHeight,constr,date,time,stressEmoji,seeall
                   ),
                 ),
               ),
-              SizedBox(width: sizeWidth * 0.15),
+              SizedBox(width: sizeWidth * 0.05),
             ],
-                                                              ),             
-                                                  SizedBox(height: sizeHeight * 0.01),
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                                children: [
-                                                                  SizedBox(width: sizeWidth * 0.6),
-                                                                  Text("More",style: TextStyle(
-                                                    color:(seeall)?Colors.white:Colors.black,
-                                                    fontSize: sizeWidth * sizeHeight * 0.00005,
-                                                    fontWeight: FontWeight.bold
-                                                  ),),
-                                                  SizedBox(width: sizeWidth * 0.006),
-                                                                  Icon(Icons.arrow_forward_rounded,color: (seeall)?Colors.white:Colors.black,size: sizeWidth* sizeHeight * 0.00005)
-                                                                ],
-                                                              )
-                                      
-                                                  ],
-                                                ),
-                                              ),
-                                            );
+          ),
+          SizedBox(height: sizeHeight * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(width: sizeWidth * 0.8),
+              Text(
+                "More",
+                style: TextStyle(
+                    color: (seeall) ? Colors.white : Colors.black,
+                    fontSize: sizeWidth * sizeHeight * 0.000025,
+                    fontWeight: FontWeight.bold),
+              ),
+              SizedBox(width: sizeWidth * 0.0003),
+              Icon(Icons.arrow_forward_rounded,
+                  color: (seeall) ? Colors.white : Colors.black,
+                  size: sizeWidth * sizeHeight * 0.000015)
+            ],
+          )
+        ],
+      ),
+    ),
+  );
 }
 
 dynamic searchNearbyPlaces(List<String> places_type, pos) async {
@@ -675,7 +686,7 @@ dynamic searchNearbyPlaces(List<String> places_type, pos) async {
   var headers = {
     'Content-Type': 'application/json',
     'X-Goog-Api-Key':
-    'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk', // Replace 'YOUR_API_KEY' with your actual API key
+        'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk', // Replace 'YOUR_API_KEY' with your actual API key
     'X-Goog-FieldMask': 'places.displayName,places.googleMapsUri'
   };
 // print("hell");
@@ -700,7 +711,6 @@ dynamic searchNearbyPlaces(List<String> places_type, pos) async {
       print('Request failed with status: ${response.statusCode}');
       print('Response body: ${response.body}');
       responseData = jsonDecode(response.body);
-
     }
   } catch (e) {
     // Handle any errors that occurred during the HTTP request
@@ -708,10 +718,11 @@ dynamic searchNearbyPlaces(List<String> places_type, pos) async {
   }
   return responseData;
 }
-Widget communitycontainer(
-    sizeWidth, sizeHeight, constr, heading, googlemapsuri, imagestring, bordercolor) {
+
+Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
+    imagestring, bordercolor) {
   return Container(
-    constraints: BoxConstraints(maxWidth: sizeWidth *0.8),
+    constraints: BoxConstraints(maxWidth: sizeWidth * 0.8),
     decoration: BoxDecoration(
         border: Border.all(
           color: bordercolor,
@@ -731,125 +742,139 @@ Widget communitycontainer(
                 fontWeight: FontWeight.bold),
           ),
           InkWell(
-            onTap:() => _launchUrl(Uri.parse(googlemapsuri)),
-          child: Text(
-            'Open in Google Maps',
-            style: TextStyle(
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
-          )
-          )],
+              onTap: () => _launchUrl(Uri.parse(googlemapsuri)),
+              child: Text(
+                'Open in Google Maps',
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ))
+        ],
       ),
     ),
   );
 }
+
 Future<void> _launchUrl(Uri _url) async {
   if (!await launchUrl(_url)) {
     throw Exception('Could not launch $_url');
   }
 }
-format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
-Widget activitymaps(sizeWidth, sizeHeight, constr, places,imagestring,{ Color bordercolor = Colors.grey}) {
-    print(places['places']);
-    return Wrap(
-      spacing: 20,
-      runSpacing: min(20, sizeWidth * 0.0006),
-      children: [
-        SizedBox(
-          height: sizeHeight * 0.01,
-        ),
-        SizedBox(
-          height: sizeHeight * 0.25,
-          child: ListView.separated(
-            reverse: false,
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            itemCount: places['places'].length,
-            itemBuilder: (context, index) {
-              return communitycontainer(
-                  sizeWidth,
-                  sizeHeight,
-                  constr,
-                  places['places'][index]['displayName']['text'].length > 20 ?  places['places'][index]['displayName']['text'].substring(0,20) :  places['places'][index]['displayName']['text'],
-                  places['places'][index]['googleMapsUri'],
-                  imagestring,bordercolor == Colors.grey ? Colors.grey.shade300 : bordercolor);
-            },
-            separatorBuilder: ((context, index) => SizedBox(
-              width: min(sizeWidth * 0.05, 30),
-            )),
-          ),
-        )
-      ],
-    );
-  }
 
-Widget youtubeContainer(sizeWidth,sizeHeight,constr,heading,description,imagestring,videoId) {
-  print("inside container");
+format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
+    {Color bordercolor = Colors.grey}) {
+  print(places['places']);
+  return Wrap(
+    spacing: 20,
+    runSpacing: min(20, sizeWidth * 0.0006),
+    children: [
+      SizedBox(
+        height: sizeHeight * 0.01,
+      ),
+      SizedBox(
+        height: sizeHeight * 0.25,
+        child: ListView.separated(
+          reverse: false,
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemCount: places['places'].length,
+          itemBuilder: (context, index) {
+            return communitycontainer(
+                sizeWidth,
+                sizeHeight,
+                constr,
+                places['places'][index]['displayName']['text'].length > 20
+                    ? places['places'][index]['displayName']['text']
+                        .substring(0, 20)
+                    : places['places'][index]['displayName']['text'],
+                places['places'][index]['googleMapsUri'],
+                imagestring,
+                bordercolor == Colors.grey
+                    ? Colors.grey.shade300
+                    : bordercolor);
+          },
+          separatorBuilder: ((context, index) => SizedBox(
+                width: min(sizeWidth * 0.05, 30),
+              )),
+        ),
+      )
+    ],
+  );
+}
+
+Widget youtubeContainer(
+    sizeWidth, sizeHeight, constr, heading, description, imagestring, videoId) {
+  print("inside youtube container");
   print(description.length);
   return Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth: sizeWidth *0.9
-                                              ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                                borderRadius: BorderRadius.all(Radius.circular(8.0))
-                                              ),
-                                              child: Padding(
-                                                padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
-                                                child: Center(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Container(
-                                                                                                                          width: sizeWidth * 0.8,
-                                                                                                                          child: Image.network(
-                                                                                                                                      imagestring.toString(),
-                                                                                                                                      fit: BoxFit.cover, // Adjust the fit as needed
-                                                                                                                                    ),
-                                                                                                                        ),
-                                                                Row(
-                                                                  children: [
-                                                                    
-                                                                                                                        SizedBox(width: min(12,sizeWidth*0.05),),
-                                                                    Expanded(
-                                                                      child: Column(
-                                                                        children: [
-                                                                          Text(heading,textAlign:TextAlign.center,style: TextStyle(
-                                                                                                                                color: Colors.white,
-                                                                                                                                fontSize: sizeWidth * sizeHeight * 0.00008,
-                                                                                                                                fontWeight: FontWeight.bold
-                                                                                                                              ),
-                                                                                                                              softWrap: true),
-                                                                                                                              SizedBox(height: min(12,sizeHeight*0.05),),
-                                                                          Text(description,style: TextStyle(
-                                                                                                                            color: Colors.white,
-                                                                                                                            fontSize: sizeWidth * sizeHeight * 0.00005,
-                                                                                                                        
-                                                                                                                          ),
-                                                                                                                          textAlign: TextAlign.center,),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                                                                        
-                                                                  ],
-                                                                ),
-                                                    SizedBox(height: min(12,sizeHeight*0.05),),
-                                                   InkWell(
-          onTap:() => _launchUrl(Uri.parse('https://www.youtube.com/watch?v=$videoId')),
-        child: Text(
-          'Checkout the YouTube video here',
-          style: TextStyle(
-            color: Colors.blue,
-            decoration: TextDecoration.underline,
-          ),
-        )
-        )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
+    constraints: BoxConstraints(maxWidth: sizeWidth * 0.9),
+    decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.grey.shade300,
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+    child: Padding(
+      padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: sizeWidth * 0.8,
+              child: Image.network(
+                imagestring.toString(),
+                fit: BoxFit.cover, // Adjust the fit as needed
+              ),
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: min(12, sizeWidth * 0.05),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(heading,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: sizeWidth * sizeHeight * 0.00003,
+                              fontWeight: FontWeight.bold),
+                          softWrap: true),
+                      SizedBox(
+                        height: min(12, sizeHeight * 0.05),
+                      ),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: sizeWidth * sizeHeight * 0.00003,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: min(12, sizeHeight * 0.05),
+            ),
+            InkWell(
+                onTap: () => _launchUrl(
+                    Uri.parse('https://www.youtube.com/watch?v=$videoId')),
+                child: Text(
+                  'Checkout the YouTube video here',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ))
+          ],
+        ),
+      ),
+    ),
+  );
 }
