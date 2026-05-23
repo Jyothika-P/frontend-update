@@ -28,8 +28,6 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   Map<String, Stream?> participantVideoStreams = {};
- 
-  
 
   bool micEnabled = true;
   bool camEnabled = true;
@@ -38,15 +36,14 @@ class _RoomScreenState extends State<RoomScreen> {
   void setParticipantStreamEvents(Participant participant) {
     participant.on(Events.streamEnabled, (Stream stream) {
       if (stream.kind == 'video') {
-        
         setState(() => participantVideoStreams[participant.id] = stream);
       }
     });
 
     participant.on(Events.streamDisabled, (Stream stream) {
       if (stream.kind == 'video') {
-        print(stream.id+" hello "+ participant.displayName);
-        setState(() =>  participantVideoStreams[participant.id] = null);
+        print(stream.id + " hello " + participant.displayName);
+        setState(() => participantVideoStreams[participant.id] = null);
       }
     });
   }
@@ -64,17 +61,18 @@ class _RoomScreenState extends State<RoomScreen> {
     });
     _room.on(Events.roomLeft, () {
       participantVideoStreams.clear();
-      if(widget.userId == 'community') deleteCall('Exams', widget.currentId);
-      else 
-      deleteCall(widget.userId, widget.currentId);
+      if (widget.userId == 'community')
+        deleteCall('Exams', widget.currentId);
+      else
+        deleteCall(widget.userId, widget.currentId);
     });
   }
-  
-   @override
+
+  @override
   void initState() {
     super.initState();
     // Create instance of Roo
-    
+
     room = VideoSDK.createRoom(
       participantId: widget.currentId,
       roomId: widget.roomId,
@@ -108,63 +106,60 @@ class _RoomScreenState extends State<RoomScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            
             ...participantVideoStreams.entries
-            .map(
-              (e) => e.key == widget.currentId ? ParticipantTile(
-                key : Key(e.key),
-                stream: e.value,
-                width : sizeWidth * 0.7,
-                height: sizeHeight*0.5,
-              ): Text(''),
-            )
-            .toList(),
+                .map(
+                  (e) => e.key == widget.currentId
+                      ? ParticipantTile(
+                          key: Key(e.key),
+                          stream: e.value,
+                          width: sizeWidth * 0.7,
+                          height: sizeHeight * 0.5,
+                        )
+                      : Text(''),
+                )
+                .toList(),
             RoomControls(
-              onToggleMicButtonPressed: () {
-                micEnabled ? room.muteMic() : room.unmuteMic();
-                setState(() => micEnabled  = !micEnabled);
-              },
-             micEnabled: micEnabled,
-             camEnabled: camEnabled,
-              onToggleCameraButtonPressed: () {
-                camEnabled
-                    ? room.disableCam()
-                    : room.enableCam();
-                setState(() => camEnabled  = !camEnabled);
-              },
-            
-              onLeaveButtonPressed: () => {room.leave(),Navigator.pop(context,"Result"),}
-            ),
+                onToggleMicButtonPressed: () {
+                  micEnabled ? room.muteMic() : room.unmuteMic();
+                  setState(() => micEnabled = !micEnabled);
+                },
+                micEnabled: micEnabled,
+                camEnabled: camEnabled,
+                onToggleCameraButtonPressed: () {
+                  camEnabled ? room.disableCam() : room.enableCam();
+                  setState(() => camEnabled = !camEnabled);
+                },
+                onLeaveButtonPressed: () => {
+                      room.leave(),
+                      Navigator.pop(context, "Result"),
+                    }),
             SizedBox(
               height: sizeHeight / 4,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox(width: 10); // Adjust the width of the separator as needed
+                  return SizedBox(
+                      width: 10); // Adjust the width of the separator as needed
                 },
                 itemCount: participantVideoStreams.entries.length,
                 itemBuilder: (BuildContext context, int index) {
                   var entry = participantVideoStreams.entries.elementAt(index);
                   return entry.key != widget.currentId
                       ? ParticipantTile(
-                        width: sizeWidth / 4,
-                        height: sizeHeight / 4,
-                        key: Key(entry.key),
-                        stream: entry.value,
-                      )
-                      : SizedBox(width: sizeWidth / 4, height: sizeHeight / 4); // Placeholder for empty tile
+                          width: sizeWidth / 4,
+                          height: sizeHeight / 4,
+                          key: Key(entry.key),
+                          stream: entry.value,
+                        )
+                      : SizedBox(
+                          width: sizeWidth / 4,
+                          height: sizeHeight / 4); // Placeholder for empty tile
                 },
               ),
             ),
-
-            
-            
-            
           ],
         ),
       ),
     );
   }
-
- 
 }

@@ -67,8 +67,10 @@ class DefaultFirebaseOptions {
     projectId: 'psychesail-c94c2',
     databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
     storageBucket: 'psychesail-c94c2.firebasestorage.app',
-    androidClientId: '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
-    iosClientId: '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
+    androidClientId:
+        '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
+    iosClientId:
+        '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
     iosBundleId: 'com.example.frontend',
   );
 
@@ -79,8 +81,10 @@ class DefaultFirebaseOptions {
     projectId: 'psychesail-c94c2',
     databaseURL: 'https://psychesail-c94c2-default-rtdb.firebaseio.com',
     storageBucket: 'psychesail-c94c2.firebasestorage.app',
-    androidClientId: '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
-    iosClientId: '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
+    androidClientId:
+        '632155284263-g7fss628m6pv22jhhtpik5g1a7kr2jpu.apps.googleusercontent.com',
+    iosClientId:
+        '632155284263-o48e1kes6q54utshp0sv94qbegbn1mau.apps.googleusercontent.com',
     iosBundleId: 'com.example.frontend',
   );
 
@@ -94,5 +98,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'psychesail-c94c2.firebasestorage.app',
     measurementId: 'G-6ZVL6WCGLS',
   );
-
 }

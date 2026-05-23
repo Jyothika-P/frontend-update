@@ -96,10 +96,10 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     print("SPEAKING");
     var lang = await flutterTts.getVoices;
     print(lang);
-      lastTextSpoken = text;
-      await flutterTts.setVoice({"name": "en-AU-language", "locale": "en-AU"});
-      await flutterTts.setPitch(0.8);
-      await flutterTts.speak(text);
+    lastTextSpoken = text;
+    await flutterTts.setVoice({"name": "en-AU-language", "locale": "en-AU"});
+    await flutterTts.setPitch(0.8);
+    await flutterTts.speak(text);
   }
 
   @override
@@ -195,7 +195,8 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                 padding: EdgeInsets.only(right: size.width / 50),
                 child: IconButton(
                     onPressed: () async {
-                      await textToSpeech("CALLING SERENITY", "CALLING SERENITY");
+                      await textToSpeech(
+                          "CALLING SERENITY", "CALLING SERENITY");
                     },
                     icon: Icon(Icons.call),
                     color: Colors.white))
@@ -221,15 +222,18 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                       color: Colors.transparent,
                       child: Column(
                         children: [
-                          Container(color: Colors.grey.shade400,
+                          Container(
+                              color: Colors.grey.shade400,
                               height: sizeHeight / 20,
-                              child: Center(child: Text(
+                              child: Center(
+                                  child: Text(
                                 "Single tap response : Pause",
-                                style: TextStyle(color: Colors.black,
+                                style: TextStyle(
+                                    color: Colors.black,
                                     fontFamily: 'AbeeZee',
                                     fontSize: 12,
-                                    fontStyle: FontStyle.italic),)))
-                          ,
+                                    fontStyle: FontStyle.italic),
+                              ))),
                           Expanded(
                             child: ListView.builder(
                                 itemCount: messages.length,
@@ -246,7 +250,7 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                 onTap: () async {
                                                   print(
                                                       "Pressed Pause- Single");
-                                                      await flutterTts.stop();
+                                                  await flutterTts.stop();
                                                 },
                                                 child: Container(
                                                   margin: (messages[index]
@@ -333,53 +337,101 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                       : Column(
                                           children: [
                                             Row(
-            mainAxisAlignment: (messages[index].role == "user") ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Container(
-          margin: (messages[index].role == "user")
-          ? EdgeInsets.only(
-              top: min(12, sizeWidth * 0.05),
-              bottom: min(12, sizeWidth * 0.05),
-              right: min(sizeHeight * 0.05, 12),
-              left: sizeHeight * 0.05,
-            )
-          : EdgeInsets.only(
-              top: min(12, sizeWidth * 0.05),
-              bottom: min(12, sizeWidth * 0.05),
-              left: min(sizeHeight * 0.05, 12),
-              right: sizeHeight * 0.05,
-            ),
-              padding: EdgeInsets.all(12.0),
-          decoration: BoxDecoration(
-                borderRadius: (messages[index].role == "user")
-            ? BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(12),
-              )
-            : BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-                color: (messages[index].role == "user")
-            ? Color.fromRGBO(32, 160, 144, 100)
-            : Colors.grey,
-                border: Border.all(color: Colors.black),
-              ),
-          child: Text(
-            messages[index].parts.first.text,
-            style: TextStyle(
-              color: (messages[index].role == "user") ? Colors.white : Colors.black,
-              fontSize: 17,
-            ),
-          ),
-                ),
-              ),
-            ],
-          ),
-          
+                                              mainAxisAlignment:
+                                                  (messages[index].role ==
+                                                          "user")
+                                                      ? MainAxisAlignment.end
+                                                      : MainAxisAlignment.start,
+                                              children: [
+                                                Flexible(
+                                                  child: Container(
+                                                    margin: (messages[index]
+                                                                .role ==
+                                                            "user")
+                                                        ? EdgeInsets.only(
+                                                            top: min(
+                                                                12,
+                                                                sizeWidth *
+                                                                    0.05),
+                                                            bottom: min(
+                                                                12,
+                                                                sizeWidth *
+                                                                    0.05),
+                                                            right: min(
+                                                                sizeHeight *
+                                                                    0.05,
+                                                                12),
+                                                            left: sizeHeight *
+                                                                0.05,
+                                                          )
+                                                        : EdgeInsets.only(
+                                                            top: min(
+                                                                12,
+                                                                sizeWidth *
+                                                                    0.05),
+                                                            bottom: min(
+                                                                12,
+                                                                sizeWidth *
+                                                                    0.05),
+                                                            left: min(
+                                                                sizeHeight *
+                                                                    0.05,
+                                                                12),
+                                                            right: sizeHeight *
+                                                                0.05,
+                                                          ),
+                                                    padding:
+                                                        EdgeInsets.all(12.0),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius: (messages[
+                                                                      index]
+                                                                  .role ==
+                                                              "user")
+                                                          ? BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(12),
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(12),
+                                                            )
+                                                          : BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(20),
+                                                              topRight: Radius
+                                                                  .circular(12),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          12),
+                                                            ),
+                                                      color: (messages[index]
+                                                                  .role ==
+                                                              "user")
+                                                          ? Color.fromRGBO(
+                                                              32, 160, 144, 100)
+                                                          : Colors.grey,
+                                                      border: Border.all(
+                                                          color: Colors.black),
+                                                    ),
+                                                    child: Text(
+                                                      messages[index]
+                                                          .parts
+                                                          .first
+                                                          .text,
+                                                      style: TextStyle(
+                                                        color: (messages[index]
+                                                                    .role ==
+                                                                "user")
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: 17,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
@@ -601,7 +653,7 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                             ),
                           if (endchat)
                             _endchat(stressScore, sizeWidth, sizeHeight,
-                                currentid, context,messages),
+                                currentid, context, messages),
                           (!endchat && !suggestplaces)
                               ? Container(
                                   padding: const EdgeInsets.symmetric(
@@ -643,10 +695,11 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                 messages[messages.length - 1]
                                                     .parts
                                                     .first
-                                                    .text, messages[messages.length - 1]
-                                                .parts
-                                                .first
-                                                .text);
+                                                    .text,
+                                                messages[messages.length - 1]
+                                                    .parts
+                                                    .first
+                                                    .text);
                                             print(userinputs);
                                           }
                                         },
@@ -668,8 +721,13 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                       color: Colors.black,
                                                     ),
                                                   )
-                                            : _endchat(stressScore, sizeWidth,
-                                                sizeHeight, currentid, context,messages),
+                                            : _endchat(
+                                                stressScore,
+                                                sizeWidth,
+                                                sizeHeight,
+                                                currentid,
+                                                context,
+                                                messages),
                                       ),
                                     ],
                                   ),
@@ -680,14 +738,18 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                     );
                   default:
                     return Column(children: [
-                      Container(color: Colors.grey.shade400,
+                      Container(
+                          color: Colors.grey.shade400,
                           height: sizeHeight / 20,
-                          child: Center(child: Text(
+                          child: Center(
+                              child: Text(
                             "Single tap response : Pause, Double Tap response : Play",
-                            style: TextStyle(color: Colors.black,
+                            style: TextStyle(
+                                color: Colors.black,
                                 fontFamily: 'AbeeZee',
                                 fontSize: 12,
-                                fontStyle: FontStyle.italic),))),
+                                fontStyle: FontStyle.italic),
+                          ))),
                       Flexible(
                         fit: FlexFit.loose,
                         child: Container(
@@ -774,10 +836,11 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                 messages[messages.length - 1]
                                                     .parts
                                                     .first
-                                                    .text, messages[messages.length - 1]
-                                                .parts
-                                                .first
-                                                .text);
+                                                    .text,
+                                                messages[messages.length - 1]
+                                                    .parts
+                                                    .first
+                                                    .text);
                                             // _messageController.clear();
                                           }
                                         },
@@ -800,7 +863,7 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                     ],
                                   )
                                 : _endchat(stressScore, sizeWidth, sizeHeight,
-                                    currentid, context,messages),
+                                    currentid, context, messages),
                           ],
                         ),
                       )
@@ -910,7 +973,8 @@ Widget _buildMessageItem(DocumentSnapshot document, currentid) {
   });
 }
 
-Widget _endchat(stressScore, sizeWidth, sizeHeight, currentid, context,messages) {
+Widget _endchat(
+    stressScore, sizeWidth, sizeHeight, currentid, context, messages) {
   Emoji stressEmoji = Emoji();
   var displayMood = (stressScore == '0')
       ? ['assets/stress_5.png', 'Therapist needed', Colors.red]
@@ -919,114 +983,114 @@ Widget _endchat(stressScore, sizeWidth, sizeHeight, currentid, context,messages)
   //   "stressScore": stressScore, // Assuming stressScore is a variable holding the score
   //   "timestamp": FieldValue.serverTimestamp() // This will get the current timestamp from the server
   // });
-  return (stressScore == '0') ? Container(
-    height : sizeHeight * 0.15,
-    child: Center(
-      child: Text(
-        "Calculating stress ....", 
-        style: TextStyle(
-                        color: Colors.black,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        fontFamily: 'AbeeZee'),
-                  
-      ),
-    )
-  ): Column(
-    children: [
-      Container(
-        margin: EdgeInsets.only(
-          top: 5,
-        ),
-        height: sizeHeight / 8,
-        // color: displayMood[2],
-        decoration: BoxDecoration(
-          color: displayMood[2], // Assuming displayMood[2] is a Color
-          // Define the border for the top side of the Container
-          border: Border(
-            top: BorderSide(
-              color: Colors.black38, // Color of the top border
-              width: 1.5, // Width of the top border
+  return (stressScore == '0')
+      ? Container(
+          height: sizeHeight * 0.15,
+          child: Center(
+            child: Text(
+              "Calculating stress ....",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  fontFamily: 'AbeeZee'),
             ),
-            bottom: BorderSide(
-              color: Colors.black38, // Color of the top border
-              width: 1.5, // Width of the top border
-            ),
-          ),
-        ),
-        // decoration: BoxDecoration(
-        //   border: Border(top:BorderSide(color: Colors.black, width: 2.0)),
-        // ),
-        child: Column(
+          ))
+      : Column(
           children: [
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: sizeWidth / 8,
-                      right: sizeWidth / 15,
-                      top: sizeHeight / 90,
-                      bottom: sizeHeight / 140),
-                  child: circleButton(false, sizeWidth / 100, sizeWidth / 50,
-                      displayMood[0].toString()),
+            Container(
+              margin: EdgeInsets.only(
+                top: 5,
+              ),
+              height: sizeHeight / 8,
+              // color: displayMood[2],
+              decoration: BoxDecoration(
+                color: displayMood[2], // Assuming displayMood[2] is a Color
+                // Define the border for the top side of the Container
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.black38, // Color of the top border
+                    width: 1.5, // Width of the top border
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.black38, // Color of the top border
+                    width: 1.5, // Width of the top border
+                  ),
                 ),
-                Text(
-                  "\"" + displayMood[1] + "\"",
-                  style: TextStyle(
+              ),
+              // decoration: BoxDecoration(
+              //   border: Border(top:BorderSide(color: Colors.black, width: 2.0)),
+              // ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: sizeWidth / 8,
+                            right: sizeWidth / 15,
+                            top: sizeHeight / 90,
+                            bottom: sizeHeight / 140),
+                        child: circleButton(false, sizeWidth / 100,
+                            sizeWidth / 50, displayMood[0].toString()),
+                      ),
+                      Text(
+                        "\"" + displayMood[1] + "\"",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 15,
+                            fontFamily: 'AbeeZee'),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "Your Final Stress Score Is : " + stressScore,
+                    style: TextStyle(
                       color: Colors.black,
+                      fontFamily: 'AbeeZee',
+                      fontWeight: FontWeight.bold,
                       fontStyle: FontStyle.italic,
                       fontSize: 15,
-                      fontFamily: 'AbeeZee'),
-                ),
-              ],
+                    ),
+                  )
+                ],
+              ),
             ),
-            Text(
-              "Your Final Stress Score Is : " + stressScore,
-              style: TextStyle(
+            SizedBox(
+              width: sizeWidth,
+              height: sizeHeight / 20,
+              child: Container(
                 color: Colors.black,
-                fontFamily: 'AbeeZee',
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                fontSize: 15,
+                child: InkWell(
+                  onTap: () async {
+                    var chatid = await fetchChatId(messages);
+                    Navigator.pushNamed(context, '/chatroom', arguments: {
+                      'currentuser': currentid,
+                      'receiverid': 'Disha',
+                      'communityname': 'community',
+                      'name': 'Stress $stressScore',
+                      'chatId': chatid
+                    });
+                  },
+                  child: Center(
+                    child: Text(
+                      "Connect & Heal: Join Tailored Stress-Matched Circle",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'AbeeZee',
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             )
           ],
-        ),
-      ),
-      SizedBox(
-        width: sizeWidth,
-        height: sizeHeight / 20,
-        child: Container(
-          color: Colors.black,
-          child: InkWell(
-            onTap: () async {
-              var chatid = await fetchChatId(messages);
-              Navigator.pushNamed(context, '/chatroom', arguments: {
-                'currentuser': currentid,
-                'receiverid': 'Disha',
-                'communityname': 'community',
-                'name': 'Stress $stressScore',
-                'chatId': chatid
-              });
-            },
-            child: Center(
-              child: Text(
-                "Connect & Heal: Join Tailored Stress-Matched Circle",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'AbeeZee',
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-        ),
-      )
-    ],
-  );
+        );
 }
 
 Widget _chatField(_messageController) {

@@ -121,7 +121,7 @@ class _ProgressState extends State<Progress> {
   }
 
   buildBody(sizeWidth, sizeHeight, data) {
-    if (isSelected[0])
+    if (isSelected[0]) {
       return ListView.separated(
         reverse: false,
         scrollDirection: Axis.vertical,
@@ -141,7 +141,7 @@ class _ProgressState extends State<Progress> {
               height: min(sizeHeight * 0.015, 30),
             )),
       );
-    else
+    } else {
       return Scaffold(
         backgroundColor: Colors.white,
         body: Padding(
@@ -184,6 +184,7 @@ class _ProgressState extends State<Progress> {
           ),
         ),
       );
+    }
   }
 
   List<FlSpot> weeklySpots(List<List<dynamic>> stressHistory) {
@@ -431,7 +432,7 @@ class _ProgressState extends State<Progress> {
                 LineChartBarData(
                   spots: check ? weeklySpots(data) : monthlySpots(data),
                   isCurved: true,
-                  color: Color.fromRGBO(10, 149, 120, 90),
+                  color: const Color.fromRGBO(10, 149, 120, 1),
                   barWidth: 4,
                   isStrokeCapRound: true,
                   dotData: FlDotData(
@@ -441,13 +442,13 @@ class _ProgressState extends State<Progress> {
                         radius: 7.5,
                         color: _getDotColor(spot.y),
                         strokeWidth: 6,
-                        strokeColor: Colors.transparent,
+                        strokeColor: const Color.fromARGB(0, 167, 81, 81),
                       );
                     },
                   ),
                   belowBarData: BarAreaData(
                     show: true,
-                    color: Color.fromRGBO(20, 139, 120, 100),
+                    color: const Color.fromRGBO(20, 139, 120, 1),
                   ),
                 ),
               ],

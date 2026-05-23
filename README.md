@@ -1,10 +1,10 @@
-# PsycheSail
+# Serenova
 
 <div style="display: flex; justify-content: center; align-items: center;">
- <img src="https://avatars.githubusercontent.com/u/156929781?s=400&u=e78410db0bb16fec2208ed7d1f1b3d944d76fc72&v=4" alt="psychesail-application" width="400" height="400">
+ <img src="https://avatars.githubusercontent.com/u/156929781?s=400&u=e78410db0bb16fec2208ed7d1f1b3d944d76fc72&v=4" alt="serenova-application" width="400" height="400">
 </div>
 
-Introducing PsycheSail: a go-to app for emotional support and self-care for students. Chat with our helpful bot, track the progress of the user's mood, discover local activities using Google Maps, and join anonymous support/community chats with peers. Need immediate help? Connect with a counselor. Plus, access recommended books and motivational videos for extra support. Sail through tough times with PsycheSail.
+Introducing Serenova: a go-to app for emotional support and self-care for students. Chat with our helpful bot, track the progress of the user's mood, discover local activities using Google Maps, and join anonymous support/community chats with peers. Need immediate help? Connect with a counselor. Plus, access recommended books and motivational videos for extra support. Sail through tough times with Serenova.
 
 Watch the product demo on:
 
@@ -116,7 +116,7 @@ We discovered that many of our peers feel depressed and like their minds stop wo
 
 - **User-Friendly Interface:** Enjoy a user-friendly interface designed for easy navigation and intuitive use, enhancing the overall user experience.
 
-- **Continuous Improvement with Gemini by Google**: PsycheSail leverages Gemini, Google's AI platform, for ongoing enhancements based on user feedback and the latest advancements in AI technology, ensuring personalized and effective therapy sessions.
+- **Continuous Improvement with Gemini by Google**: Serenova leverages Gemini, Google's AI platform, for ongoing enhancements based on user feedback and the latest advancements in AI technology, ensuring personalized and effective therapy sessions.
 
 <!-- ### 🪲✅ Bug Fixes
 
@@ -125,7 +125,7 @@ We discovered that many of our peers feel depressed and like their minds stop wo
 
 ### 👀 Upcoming Features
 
-- **Personalized Storytelling:** PsycheSail's Personalized Storytelling integrates challenges and victories from users' conversations with Serenity. It offers an interactive narrative journey guided by an empathetic companion, reflecting real-life experiences. Enhancements with additional graphics are planned for a more compelling user experience.
+- **Personalized Storytelling:** Serenova's Personalized Storytelling integrates challenges and victories from users' conversations with Serenity. It offers an interactive narrative journey guided by an empathetic companion, reflecting real-life experiences. Enhancements with additional graphics are planned for a more compelling user experience.
 
 - **Achievement Badges:** Users earn badges for completing tasks or reaching milestones. Examples include completing chat sessions or practicing self-care activities. This system encourages positive engagement, fostering a sense of accomplishment.
 
@@ -137,7 +137,7 @@ We discovered that many of our peers feel depressed and like their minds stop wo
 
 - **Collaboration with Licensed Therapists:** The plan is to collaborate with therapists for professional counseling services. This expands mental health support by providing access to qualified professionals.
 
-- **Marketing and Outreach:** The focus is on advertising and social media to raise awareness. Increasing visibility highlights PsycheSail's benefits, attracting more users.
+- **Marketing and Outreach:** The focus is on advertising and social media to raise awareness. Increasing visibility highlights Serenova's benefits, attracting more users.
 
 <hr>
 
@@ -172,7 +172,7 @@ We discovered that many of our peers feel depressed and like their minds stop wo
 
 <hr>
 
-Download PsycheSail directly from our [GitHub repository](https://github.com/PSYCHE-SAIL/frontend). After downloading the app, you can sign up for an account using your Google account.
+Download Serenova directly from our [GitHub repository](https://github.com/PSYCHE-SAIL/frontend). After downloading the app, you can sign up for an account using your Google account.
 
 ### 📝 Prerequisites
 
@@ -186,7 +186,7 @@ Before you start, make sure you have installed the following on your system:
 
 ### 🛠️ Installation
 
-1. Clone the PsycheSail repository from GitHub: https://github.com/PSYCHE-SAIL/frontend
+1. Clone the Serenova repository from GitHub: https://github.com/PSYCHE-SAIL/frontend
 
 2. Open the project folder in VS Code.
 
@@ -194,7 +194,7 @@ Before you start, make sure you have installed the following on your system:
 
 4. In VS Code, open the main.dart file and click the "Run" button. This will launch the app in the emulator or on your physical device.
 
-5. Visit the PsycheSail backend repository from GitHub: https://github.com/PSYCHE-SAIL/backend and follow the steps there to setup the backend.
+5. Visit the Serenova backend repository from GitHub: https://github.com/PSYCHE-SAIL/backend and follow the steps there to setup the backend.
 
 <hr>
 
@@ -230,15 +230,15 @@ Once you have Logged In, you can start exploring the app's features.
 
 ### 🤖 Start Interacting with Serenity
 
-To get started with PsycheSail's Serenity, simply open the chat interface in the app. Type your thoughts or feelings, and the AI therapist will provide personalized support and guidance in real-time. Engage in natural conversations to address your emotional needs and receive empathetic responses instantly.
+To get started with Serenova's Serenity, simply open the chat interface in the app. Type your thoughts or feelings, and the AI therapist will provide personalized support and guidance in real-time. Engage in natural conversations to address your emotional needs and receive empathetic responses instantly.
 
 ### 🗣️ Interact with others
 
-PsycheSail offers a feature where users can connect with others facing similar challenges through anonymous group chats. If multiple users are experiencing similar struggles, they are brought together in these safe and supportive spaces where they can share their thoughts and feelings openly, without fear of judgment. This feature aims to combat the sense of isolation that many students experience by fostering a sense of community and solidarity among peers.
+Serenova offers a feature where users can connect with others facing similar challenges through anonymous group chats. If multiple users are experiencing similar struggles, they are brought together in these safe and supportive spaces where they can share their thoughts and feelings openly, without fear of judgment. This feature aims to combat the sense of isolation that many students experience by fostering a sense of community and solidarity among peers.
 
 ### 👍 Explore Nearby Recreational Activities
 
-PsycheSail incorporates a feature that suggests nearby recreational activities to users, encouraging them to step out of the house and engage in leisurely pursuits. Utilizing the Google Maps API, the app identifies various recreational options in the vicinity, such as parks, cafes, or cultural attractions, tailored to the user's location. By encouraging outdoor activities, PsycheSail aims to promote relaxation, physical activity, and a change of scenery, which can positively impact mental well-being and alleviate feelings of stress and isolation.
+Serenova incorporates a feature that suggests nearby recreational activities to users, encouraging them to step out of the house and engage in leisurely pursuits. Utilizing the Google Maps API, the app identifies various recreational options in the vicinity, such as parks, cafes, or cultural attractions, tailored to the user's location. By encouraging outdoor activities, Serenova aims to promote relaxation, physical activity, and a change of scenery, which can positively impact mental well-being and alleviate feelings of stress and isolation.
 
 ### 📊 Mood Tracking and Progress Visualization
 
@@ -266,17 +266,17 @@ Experience seamless interaction with Serenity through voice-based communication.
 
 ### 💫 Licensed Therapist Support
 
-PsycheSail offers seamless support by connecting users to licensed therapists if they don't feel better after a while. This feature ensures that users have access to professional help when needed, further enhancing the app's commitment to prioritizing mental well-being and providing comprehensive support for struggling students.
+Serenova offers seamless support by connecting users to licensed therapists if they don't feel better after a while. This feature ensures that users have access to professional help when needed, further enhancing the app's commitment to prioritizing mental well-being and providing comprehensive support for struggling students.
 
 ### 🆘 Emergency Assistance
 
-PsycheSail includes an emergency assistance feature that provides immediate support for individuals experiencing suicidal thoughts. In this section, users can access a dedicated call function where they can connect directly with a suicide helpline number. This integration ensures that users in crisis have quick and direct access to vital support services, emphasizing PsycheSail's commitment to prioritizing user safety and mental health.
+Serenova includes an emergency assistance feature that provides immediate support for individuals experiencing suicidal thoughts. In this section, users can access a dedicated call function where they can connect directly with a suicide helpline number. This integration ensures that users in crisis have quick and direct access to vital support services, emphasizing Serenova's commitment to prioritizing user safety and mental health.
 
 <hr>
 
 ## 🤝 Contributing
 
-If you would like to contribute to PsycheSail, please fork the project on GitHub and submit a pull request.
+If you would like to contribute to Serenova, please fork the project on GitHub and submit a pull request.
 
 ## 🙏 Acknowledgments
 

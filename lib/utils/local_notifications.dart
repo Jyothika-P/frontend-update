@@ -23,7 +23,7 @@ import 'package:timezone/data/latest.dart' as tz;
 //     flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
 //         AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 //     const AndroidInitializationSettings initializationSettingsAndroid =
-//         AndroidInitializationSettings('@drawable/psychesail');
+//         AndroidInitializationSettings('@drawable/serenova');
 //     final DarwinInitializationSettings initializationSettingsDarwin =
 //         DarwinInitializationSettings(
 //             onDidReceiveLocalNotification: (id, title, body, payload) => null);
@@ -99,7 +99,7 @@ import 'package:timezone/data/latest.dart' as tz;
 class NotificationsFirebase {
   static final _firebaseMessaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin
-  _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   // request notification permission
   static Future init() async {
@@ -120,49 +120,50 @@ class NotificationsFirebase {
   static Future localNotiInit() async {
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings(
+        AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
     final DarwinInitializationSettings initializationSettingsDarwin =
-    DarwinInitializationSettings(
+        DarwinInitializationSettings(
       onDidReceiveLocalNotification: (id, title, body, payload) => null,
     );
     final LinuxInitializationSettings initializationSettingsLinux =
-    LinuxInitializationSettings(defaultActionName: 'Open notification');
+        LinuxInitializationSettings(defaultActionName: 'Open notification');
     final InitializationSettings initializationSettings =
-    InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsDarwin,
-        linux: initializationSettingsLinux);
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+            linux: initializationSettingsLinux);
 
     // request notification permissions for android 13 or above
     _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()!
+            AndroidFlutterLocalNotificationsPlugin>()!
         .requestNotificationsPermission();
 
     _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onDidReceiveNotificationResponse: onNotificationTap,
         onDidReceiveBackgroundNotificationResponse: onNotificationTap);
   }
-static void onNotificationTap(NotificationResponse notificationResponse) {}
 
-  static Future showSimpleNotification ({
-    required String title,
-    required String body,
-    required String payload
-}) async{
+  static void onNotificationTap(NotificationResponse notificationResponse) {}
+
+  static Future showSimpleNotification(
+      {required String title,
+      required String body,
+      required String payload}) async {
     const AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails('your channel id', 'your channel name',
-        channelDescription: 'your channel description',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker');
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
     const NotificationDetails notificationDetails =
-    NotificationDetails(android: androidNotificationDetails);
+        NotificationDetails(android: androidNotificationDetails);
     await _flutterLocalNotificationsPlugin
         .show(0, title, body, notificationDetails, payload: payload);
   }
+
   static Future showScheduledNotification(
       {required String title,
       required String body,

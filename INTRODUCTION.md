@@ -1,10 +1,10 @@
-# PsycheSail
+# Serenova
 [![Demo Video](https://img.shields.io/badge/-Demo%20Video-red)](https)
 
 
 ## Overview
 
-PsycheSail is an app for students who need help with their feelings. It has a chatbot that talks to you and gives you ways to feel better. It also shows you fun things to do nearby on a map. You can join a group chat with other people who feel the same way as you. If things are really bad, you can talk to a counselor right away. It's all about helping you feel better and stay strong together.
+Serenova is an app for students who need help with their feelings. It has a chatbot that talks to you and gives you ways to feel better. It also shows you fun things to do nearby on a map. You can join a group chat with other people who feel the same way as you. If things are really bad, you can talk to a counselor right away. It's all about helping you feel better and stay strong together.
 
 ## Contributors:
 
@@ -15,7 +15,7 @@ PsycheSail is an app for students who need help with their feelings. It has a ch
 
 ## Table of Contents
 
-- [PsycheSail](#psychesail)
+- [Serenova](#serenova)
   - [Overview](#overview)
   - [Contributors:](#contributors)
   - [Table of Contents](#table-of-contents)
@@ -29,7 +29,7 @@ PsycheSail is an app for students who need help with their feelings. It has a ch
 
 ## Inspiration
 
-In recent times, the alarming increase in the rate of student suicides has become a deeply concerning reality. Being students ourselves, we noticed that many of our peers were silently struggling with stress and mental health challenges. We observed the tangible impact of academic pressure and limited access to mental health support, exacerbating the rise in student suicides. This hit close to home, and we felt a strong need to do something about it. PsycheSail was born from our own experiences and the burning desire to create a tool that helps students navigate the challenges of student life with better mental health. We are driven by the mission to ensure every student has the support they need to thrive, and that's why we created PsycheSail – to be a friend in tough times.
+In recent times, the alarming increase in the rate of student suicides has become a deeply concerning reality. Being students ourselves, we noticed that many of our peers were silently struggling with stress and mental health challenges. We observed the tangible impact of academic pressure and limited access to mental health support, exacerbating the rise in student suicides. This hit close to home, and we felt a strong need to do something about it. Serenova was born from our own experiences and the burning desire to create a tool that helps students navigate the challenges of student life with better mental health. We are driven by the mission to ensure every student has the support they need to thrive, and that's why we created Serenova – to be a friend in tough times.
 
 ## Goals
 
@@ -73,11 +73,11 @@ In recent times, the alarming increase in the rate of student suicides has becom
   - Industry-leading platform providing accurate location data.
   - Suggests nearby recreational activities based on user location and preferences.
   
-These technologies collectively contribute to the holistic and intelligent features of PsycheSail, enhancing mental health support and community resilience.
+These technologies collectively contribute to the holistic and intelligent features of Serenova, enhancing mental health support and community resilience.
 
 ## Challenges
 
-Building PsycheSail presented a set of challenges that required thoughtful consideration and technical innovation:
+Building Serenova presented a set of challenges that required thoughtful consideration and technical innovation:
 
 - **Collecting Student Responses:**
   - Gathering diverse and comprehensive data on the various stressors students face posed a challenge, requiring creative approaches for effective data collection.
@@ -86,11 +86,11 @@ Building PsycheSail presented a set of challenges that required thoughtful consi
   - Concluding on the optimal mix of features, including the chatbot, anonymous group chat, and connections with certified therapists, to address a wide spectrum of student stressors.
 
 - **Ensuring User Engagement:**
-  - Encouraging active participation in the anonymous group chat and fostering engagement with the chatbot to make PsycheSail a valuable resource for users.
+  - Encouraging active participation in the anonymous group chat and fostering engagement with the chatbot to make Serenova a valuable resource for users.
 
 ## Accomplishments
 
-PsycheSail has achieved significant milestones in its journey to address the pressing issue of student mental health and well-being:
+Serenova has achieved significant milestones in its journey to address the pressing issue of student mental health and well-being:
 
 - **Stress Reduction Impact:**
   - Implemented an intelligent chatbot resulting in an 14% reduction in self-reported stress levels among users.
@@ -105,19 +105,19 @@ PsycheSail has achieved significant milestones in its journey to address the pre
   - Implemented a seamless process, resulting in a 22% reduction in wait times for users seeking help from licensed counselors during critical situations.
 
 - **Alignment with UN SDGs:**
-  - PsycheSail is aligned with the United Nations Sustainable Development Goal 3: Good Health and Well-being, specifically targeting the reduction of premature mortality from non-communicable diseases and promoting mental health by 2030.
+  - Serenova is aligned with the United Nations Sustainable Development Goal 3: Good Health and Well-being, specifically targeting the reduction of premature mortality from non-communicable diseases and promoting mental health by 2030.
 
 These accomplishments signify our commitment to making a meaningful impact on student mental health, creating positive change, and providing a beacon of support for individuals navigating the challenges of student life.
 
 ## What We Learned
 
-In the journey of creating PsycheSail, our team gained valuable lessons that shaped both the app and our understanding of mental health:
+In the journey of creating Serenova, our team gained valuable lessons that shaped both the app and our understanding of mental health:
 
 - **Adapting to Change:**
   - Embraced an iterative development approach, allowing us to adapt and refine features based on changing circumstances and user input.
 
 - **Measuring Impact:**
-  - Implemented effective ways to measure the impact of PsycheSail, using data to understand how the app positively influences users' well-being.
+  - Implemented effective ways to measure the impact of Serenova, using data to understand how the app positively influences users' well-being.
 
 - **Team Collaboration:**
   - Recognized the power of teamwork and effective communication, understanding that diverse perspectives contribute to a stronger and more innovative solution.
@@ -125,22 +125,22 @@ In the journey of creating PsycheSail, our team gained valuable lessons that sha
 - **Breaking Stigmas:**
   - Learned the importance of creating a supportive space that encourages open conversations about mental health, aiming to break down stigmas associated with seeking help.
 
-These learnings have not only improved PsycheSail but also deepened our commitment to providing meaningful support for student mental health.
+These learnings have not only improved Serenova but also deepened our commitment to providing meaningful support for student mental health.
 
 ## What's Next
 
-As we move forward with PsycheSail, our focus is on continuous improvement and expanding the positive impact on student mental health:
+As we move forward with Serenova, our focus is on continuous improvement and expanding the positive impact on student mental health:
 
 - **Gamification for Engagement:**
   - Implement gamification elements to boost user engagement, making the mental health journey more interactive and rewarding.
 
 - **Incorporating User Feedback:**
-  - Continue gathering and analyzing user feedback to inform updates, ensuring that PsycheSail evolves based on the evolving needs of our users.
+  - Continue gathering and analyzing user feedback to inform updates, ensuring that Serenova evolves based on the evolving needs of our users.
 
 - **Expanding Counselor Network:**
   - Work towards expanding the network of certified counselors available through the app, ensuring timely and accessible professional support.
 
 - **Accessibility Improvements:**
-  - Focus on making PsycheSail more accessible to a wider audience, addressing any barriers that may limit its use.
+  - Focus on making Serenova more accessible to a wider audience, addressing any barriers that may limit its use.
 
-Our journey doesn't end here. PsycheSail will continue evolving, guided by our commitment to providing comprehensive and effective mental health support for students.
+Our journey doesn't end here. Serenova will continue evolving, guided by our commitment to providing comprehensive and effective mental health support for students.

@@ -17,16 +17,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   List<BotChatMessageModel> messages = [];
-  FutureOr<dynamic> prompting (prompt) async{
+  FutureOr<dynamic> prompting(prompt) async {
     messages.add(BotChatMessageModel(
         role: "user", parts: [ChatPartModel(text: prompt)]));
-    String generatedText  = await ChatRepo.chatTextGenerationRepo(messages);
-    if(generatedText.length>0) {
-      messages.add(BotChatMessageModel(role: 'model', parts: [ChatPartModel(text: generatedText)]));
+    var generatedText = await ChatRepo.chatTextGenerationRepo(messages);
+    if ((generatedText ?? '').isNotEmpty) {
+      messages.add(BotChatMessageModel(
+          role: 'model', parts: [ChatPartModel(text: generatedText!)]));
     }
     print(generatedText);
-    return ;
+    return;
   }
+
   FutureOr<dynamic> chatGenerateNewTextMessageEvent(
       ChatGenerateNewTextMessageEvent event) async {
     // await prompting("You are an AI therapist designed to act as a supportive chatbot for a student struggling with academic stress. Your role is to provide empathetic support and motivation to help the student overcome their challenges. Initiate the conversation by asking the student how they're feeling and what's been on their mind lately. Listen carefully to their response, acknowledging their feelings and reassuring them that they're not alone in their struggles. Once they've expressed their concerns, offer a brief motivational message or quote to uplift their spirits. For example, you could say, 'Remember, every successful person has faced setbacks. It's how we respond to them that matters most.' Encourage the student to focus on their strengths and past achievements, reminding them of their capabilities. Keep the conversation light and positive, gently guiding the student towards a more optimistic outlook on their academic journey. Your goal is to provide comfort and encouragement through brief, supportive interactions, helping the student build confidence and resilience over time.");
@@ -35,12 +37,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         role: "user", parts: [ChatPartModel(text: event.inputMessage)]));
 
     emit(ChatSuccessState(messages: messages));
-    String generatedText  = await ChatRepo.chatTextGenerationRepo(messages);
-    if(generatedText.length>0) {
-      messages.add(BotChatMessageModel(role: 'model', parts: [ChatPartModel(text: generatedText)]));
+    var generatedText = await ChatRepo.chatTextGenerationRepo(messages);
+    if ((generatedText ?? '').isNotEmpty) {
+      messages.add(BotChatMessageModel(
+          role: 'model', parts: [ChatPartModel(text: generatedText!)]));
     }
     return (messages);
-
   }
 }
 // ignore: invalid_use_of_visible_for_testing_member

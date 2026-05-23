@@ -85,7 +85,7 @@ Widget dividervertical(constr, greaterwidth, lesswidth, col) {
   return Column(
     children: [
       Container(
-        margin: EdgeInsets.symmetric(vertical: 8.0),
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: Container(
           color: Colors.grey,
           height: greaterwidth,
@@ -102,7 +102,7 @@ Widget dividervertical(constr, greaterwidth, lesswidth, col) {
             fontWeight: FontWeight.w400,
           )),
       Container(
-        margin: EdgeInsets.symmetric(vertical: 8.0),
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: Container(
           color: Colors.grey,
           height: greaterwidth,
@@ -115,9 +115,9 @@ Widget dividervertical(constr, greaterwidth, lesswidth, col) {
 
 InputDecoration logininput(txt, example) {
   return InputDecoration(
-      border: UnderlineInputBorder(),
+      border: const UnderlineInputBorder(),
       labelText: txt,
-      labelStyle: TextStyle(
+      labelStyle: const TextStyle(
           fontStyle: FontStyle.italic,
           fontFamily: 'ABeeZee',
           fontWeight: FontWeight.w400,
@@ -138,7 +138,7 @@ Widget textbubble(
       children: [
         Container(
             child: Padding(
-          padding: EdgeInsets.all(9.0),
+          padding: const EdgeInsets.all(9.0),
           child: (constr)
               ? Container()
               : RandomAvatar(receiverid,
@@ -146,7 +146,7 @@ Widget textbubble(
         )),
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(11),
+            padding: const EdgeInsets.all(11),
             decoration: BoxDecoration(
               color: bgcolor,
               borderRadius: BorderRadius.circular(12),
@@ -161,10 +161,10 @@ Widget textbubble(
                       color: (constr) ? Colors.white : Colors.black,
                       fontSize: 17),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   timestamp,
-                  style: TextStyle(color: Colors.black45, fontSize: 12),
+                  style: const TextStyle(color: Colors.black45, fontSize: 12),
                 ),
               ],
             ),
@@ -220,7 +220,7 @@ Widget homechatbubble(
 
 Widget settingsContainer(constr, rad, sizeWidth, iconUsed, heading, hint) {
   return Padding(
-    padding: EdgeInsets.all(16.0),
+    padding: const EdgeInsets.all(16.0),
     child: Row(
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -280,7 +280,7 @@ Widget _maptextbubble(size) {
         // )),
         Flexible(
           child: Container(
-            padding: EdgeInsets.all(11),
+            padding: const EdgeInsets.all(11),
             decoration: BoxDecoration(
               color: Colors.grey,
               borderRadius: BorderRadius.circular(12),
@@ -291,7 +291,7 @@ Widget _maptextbubble(size) {
                 Container(
                   constraints: BoxConstraints(
                       minHeight: size.height / 3, minWidth: size.width / 4),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       image: DecorationImage(
                     image: AssetImage("assets/maps_image.png"),
                     fit: BoxFit.cover,
@@ -304,7 +304,7 @@ Widget _maptextbubble(size) {
                 //       fontSize: 17),
                 // ),
                 // SizedBox(height: 4),
-                Text(
+                const Text(
                   "https://maps.app.goo.gl/smBnLVPhTkBku2uk8",
                   style: TextStyle(color: Colors.black, fontSize: 17),
                 )
@@ -354,10 +354,10 @@ Widget communityContainer(sizeWidth, sizeHeight, constr, heading, description,
               color: Colors.grey.withOpacity(0.5), // Greyish color with opacity
               spreadRadius: 3, // Controls how far the shadow spreads
               blurRadius: 3, // Controls the blurriness of the shadow
-              offset: Offset(0, 0), // Controls the position of the shadow
+              offset: const Offset(0, 0), // Controls the position of the shadow
             ),
           ],
-          borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          borderRadius: const BorderRadius.all(Radius.circular(8.0))),
       child: Padding(
         padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
         child: Column(
@@ -395,7 +395,7 @@ Widget bookContainer(sizeWidth, sizeHeight, constr, heading, description,
         border: Border.all(
           color: Colors.grey.shade300,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        borderRadius: const BorderRadius.all(Radius.circular(8.0))),
     child: Padding(
       padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
       child: Center(
@@ -445,7 +445,7 @@ Widget bookContainer(sizeWidth, sizeHeight, constr, heading, description,
             ),
             InkWell(
                 onTap: () => _launchUrl(previewstring),
-                child: Text(
+                child: const Text(
                   'Preview the recommended book',
                   style: TextStyle(
                     color: Colors.blue,
@@ -474,7 +474,7 @@ Widget callingContainer(sizeWidth, sizeHeight, constr, user) {
         border: Border.all(
           color: Colors.grey.shade300,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        borderRadius: const BorderRadius.all(Radius.circular(8.0))),
     child: Padding(
       padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
       child: Column(
@@ -483,12 +483,12 @@ Widget callingContainer(sizeWidth, sizeHeight, constr, user) {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.call, color: Color.fromRGBO(35, 154, 139, 75)),
+              const Icon(Icons.call, color: Color.fromRGBO(35, 154, 139, 75)),
               SizedBox(width: sizeWidth * 0.01),
               Text(
                 "Calling ...",
                 style: TextStyle(
-                    color: Color.fromRGBO(35, 154, 139, 75),
+                    color: const Color.fromRGBO(35, 154, 139, 75),
                     fontSize: sizeWidth * sizeHeight * 0.00005,
                     fontWeight: FontWeight.bold),
               )
@@ -535,8 +535,8 @@ Widget activityContainer(context, sizeWidth, sizeHeight, constr, heading,
     },
     child: Container(
       constraints: BoxConstraints(maxWidth: sizeWidth * 0.5),
-      decoration:
-          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(8.0))),
       child: Padding(
         padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
         child: Column(
@@ -565,7 +565,7 @@ Widget historyContainer(
       border: Border.all(
         color: Colors.grey.shade300,
       ),
-      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      borderRadius: const BorderRadius.all(Radius.circular(8.0)),
     ),
     child: Padding(
       padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
@@ -585,7 +585,7 @@ Widget historyContainer(
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Icons.calendar_month_rounded,
+                        const Icon(Icons.calendar_month_rounded,
                             color: Color.fromRGBO(35, 154, 139, 75)),
                         SizedBox(width: sizeWidth * 0.02),
                         Text(
@@ -601,7 +601,7 @@ Widget historyContainer(
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.schedule,
+                        const Icon(Icons.schedule,
                             color: Color.fromRGBO(35, 154, 139, 75)),
                         SizedBox(width: sizeWidth * 0.02),
                         Text(
@@ -626,7 +626,7 @@ Widget historyContainer(
             children: [
               SizedBox(width: sizeWidth * 0.15),
               AnimatedContainer(
-                duration: Duration(milliseconds: 5000),
+                duration: const Duration(milliseconds: 5000),
                 curve: Curves.linear,
                 child: Text(
                   stressEmoji[1],
@@ -644,18 +644,18 @@ Widget historyContainer(
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              SizedBox(width: sizeWidth * 0.8),
+              SizedBox(width: sizeWidth * 0.4),
               Text(
                 "More",
                 style: TextStyle(
-                    color: (seeall) ? Colors.white : Colors.black,
-                    fontSize: sizeWidth * sizeHeight * 0.000025,
+                    color: (!seeall) ? Colors.white : Colors.black,
+                    fontSize: sizeWidth * sizeHeight * 0.000035,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(width: sizeWidth * 0.0003),
+              SizedBox(width: sizeWidth * 0.0002),
               Icon(Icons.arrow_forward_rounded,
-                  color: (seeall) ? Colors.white : Colors.black,
-                  size: sizeWidth * sizeHeight * 0.000015)
+                  color: (!seeall) ? Colors.white : Colors.black,
+                  size: sizeWidth * sizeHeight * 0.00002)
             ],
           )
         ],
@@ -678,22 +678,25 @@ dynamic searchNearbyPlaces(List<String> places_type, pos) async {
       }
     }
   };
-  print("hellooo");
+  // print("hellooo");
   // Encode the request body to JSON
   var requestBodyJson = jsonEncode(requestBody);
-  print("hiii");
+  print("searching nearby places");
   // Define the headers
   var headers = {
     'Content-Type': 'application/json',
-    'X-Goog-Api-Key':
-        'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk', // Replace 'YOUR_API_KEY' with your actual API key
     'X-Goog-FieldMask': 'places.displayName,places.googleMapsUri'
   };
 // print("hell");
   try {
     // Make the HTTP POST request
+    // Use the API key as a query parameter. If you have restrictions on the key,
+    // verify them in Google Cloud Console (APIs & Services -> Credentials).
+    final placesApiKey = 'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk';
+    var uri = Uri.parse(
+        'https://places.googleapis.com/v1/places:searchNearby?key=$placesApiKey');
     var response = await http.post(
-      Uri.parse('https://places.googleapis.com/v1/places:searchNearby'),
+      uri,
       headers: headers,
       body: requestBodyJson,
     );
@@ -710,7 +713,17 @@ dynamic searchNearbyPlaces(List<String> places_type, pos) async {
       // Request was not successful
       print('Request failed with status: ${response.statusCode}');
       print('Response body: ${response.body}');
-      responseData = jsonDecode(response.body);
+      try {
+        responseData = jsonDecode(response.body);
+      } catch (_) {
+        responseData = {
+          'error': {'code': response.statusCode, 'message': response.body}
+        };
+      }
+      if (response.statusCode == 403) {
+        print(
+            '403 Permission denied from Google Places API. Check API key, billing, and API restrictions in Google Cloud Console.');
+      }
     }
   } catch (e) {
     // Handle any errors that occurred during the HTTP request
@@ -727,7 +740,7 @@ Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
         border: Border.all(
           color: bordercolor,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        borderRadius: const BorderRadius.all(Radius.circular(8.0))),
     child: Padding(
       padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00004),
       child: Column(
@@ -743,7 +756,7 @@ Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
           ),
           InkWell(
               onTap: () => _launchUrl(Uri.parse(googlemapsuri)),
-              child: Text(
+              child: const Text(
                 'Open in Google Maps',
                 style: TextStyle(
                   color: Colors.blue,
@@ -765,7 +778,12 @@ Future<void> _launchUrl(Uri _url) async {
 format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
 Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
     {Color bordercolor = Colors.grey}) {
-  print(places['places']);
+  final dynamic placeList =
+      (places is Map && places.containsKey('places')) ? places['places'] : null;
+  if (placeList == null || placeList is! List) {
+    return SizedBox.shrink();
+  }
+  print(placeList);
   return Wrap(
     spacing: 20,
     runSpacing: min(20, sizeWidth * 0.0006),
@@ -779,17 +797,19 @@ Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
           reverse: false,
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
-          itemCount: places['places'].length,
+          itemCount: placeList.length,
           itemBuilder: (context, index) {
+            final item = placeList[index] as Map? ?? {};
+            final display = (item?['displayName'] is Map &&
+                    item['displayName']!.containsKey('text'))
+                ? item['displayName']['text']
+                : '';
             return communitycontainer(
                 sizeWidth,
                 sizeHeight,
                 constr,
-                places['places'][index]['displayName']['text'].length > 20
-                    ? places['places'][index]['displayName']['text']
-                        .substring(0, 20)
-                    : places['places'][index]['displayName']['text'],
-                places['places'][index]['googleMapsUri'],
+                display.length > 20 ? display.substring(0, 20) : display,
+                item?['googleMapsUri'] ?? '',
                 imagestring,
                 bordercolor == Colors.grey
                     ? Colors.grey.shade300
@@ -814,7 +834,7 @@ Widget youtubeContainer(
         border: Border.all(
           color: Colors.grey.shade300,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        borderRadius: const BorderRadius.all(Radius.circular(8.0))),
     child: Padding(
       padding: EdgeInsets.all(sizeHeight * sizeWidth * 0.00005),
       child: Center(
@@ -865,7 +885,7 @@ Widget youtubeContainer(
             InkWell(
                 onTap: () => _launchUrl(
                     Uri.parse('https://www.youtube.com/watch?v=$videoId')),
-                child: Text(
+                child: const Text(
                   'Checkout the YouTube video here',
                   style: TextStyle(
                     color: Colors.blue,

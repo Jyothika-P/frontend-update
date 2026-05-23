@@ -19,27 +19,27 @@ import './pages/onboarding.dart';
 import './pages/login.dart';
 import './pages/home.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart'; 
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import './pages/signup.dart';
 import './pages/chatroom.dart';
 import './pages/settings.dart';
 import 'firebase_options.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 // listen to background changes
 
-Future _firebaseBackgroundMessage (RemoteMessage message) async{
- if(message.notification != null) {
-   print("Some notification received in the background");
-
- }
+Future _firebaseBackgroundMessage(RemoteMessage message) async {
+  if (message.notification != null) {
+    print("Some notification received in the background");
+  }
 }
 
 void main() async {
-  if(Platform.isWindows || Platform.isLinux) {
-   await FacebookAuth.i.webAndDesktopInitialize(
+  if (Platform.isWindows || Platform.isLinux) {
+    await FacebookAuth.i.webAndDesktopInitialize(
       appId: "918788496148996",
       cookie: true,
       xfbml: true,
@@ -57,7 +57,7 @@ void main() async {
   // background
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundMessage);
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    if(message.notification != null) {
+    if (message.notification != null) {
       print("Background Notification Tapped");
     }
   });
@@ -68,24 +68,29 @@ void main() async {
     print("Got message in foreground");
     print(payloadData);
 
-    if(message.notification != null) {
-      NotificationsFirebase.showSimpleNotification(title: message.notification!.title!, body: message.notification!.body!, payload: payloadData);
+    if (message.notification != null) {
+      NotificationsFirebase.showSimpleNotification(
+          title: message.notification!.title!,
+          body: message.notification!.body!,
+          payload: payloadData);
     }
   });
 
   // terminated
-  final RemoteMessage? message = await FirebaseMessaging.instance.getInitialMessage();
+  final RemoteMessage? message =
+      await FirebaseMessaging.instance.getInitialMessage();
   if (message != null) {
     print("Launched from terminated state");
-  };
+  }
+  ;
 
   runApp(MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+  static const double _globalTextScale = 0.92;
 
   // This widget is the root of your application.
   @override
@@ -93,28 +98,34 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => Places(),
       child: MaterialApp(
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              textScaler: const TextScaler.linear(_globalTextScale),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         navigatorObservers: [routeObserver],
-        title: 'PsycheSail',
+        title: 'Serenova',
         initialRoute: '/',
         routes: {
           '/': (context) => const onboarding(),
           '/login': (context) => const Login(),
           '/Signup': (context) => const Signup(),
-          '/home':(context) => const home(),
-          '/chatroom':(context) => const ChatRoom(),
-          '/monkeybot':(context) => MonkeyBotChatRoom(),
-          '/settings':(context)=> const Setting(),
-          '/call_page':(context) => const CallPage(),
-          '/progress' :(context) => const Progress(),
-          '/activity-maps':(context) => ActivityMaps(),
-          '/video' : (context) => VideoSDKQuickStart(),
+          '/home': (context) => const home(),
+          '/chatroom': (context) => const ChatRoom(),
+          '/monkeybot': (context) => MonkeyBotChatRoom(),
+          '/settings': (context) => const Setting(),
+          '/call_page': (context) => const CallPage(),
+          '/progress': (context) => const Progress(),
+          '/activity-maps': (context) => ActivityMaps(),
+          '/video': (context) => VideoSDKQuickStart(),
         },
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(useMaterial3: true),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(useMaterial3: true),
       ),
     );
-  
   }
 }
-
-

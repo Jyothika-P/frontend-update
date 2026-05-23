@@ -14,17 +14,17 @@ class ActivityMapsWidget extends StatefulWidget {
   final String currentUserId;
   final dynamic arr;
 
-  const ActivityMapsWidget({
-    Key? key,
-    required this.sizeWidth,
-    required this.sizeHeight,
-    required this.constr,
-    required this.pos,
-    required this.con,
-    required this.activityString,
-    required this.currentUserId,
-    required this.arr 
-  }) : super(key: key);
+  const ActivityMapsWidget(
+      {Key? key,
+      required this.sizeWidth,
+      required this.sizeHeight,
+      required this.constr,
+      required this.pos,
+      required this.con,
+      required this.activityString,
+      required this.currentUserId,
+      required this.arr})
+      : super(key: key);
 
   @override
   State<ActivityMapsWidget> createState() => _ActivityMapsWidgetState();
@@ -33,28 +33,26 @@ class ActivityMapsWidget extends StatefulWidget {
 class _ActivityMapsWidgetState extends State<ActivityMapsWidget> {
   @override
   Widget build(BuildContext context) {
-    // Places place = Provider.of<Places>(context);
+    Places place = Provider.of<Places>(context);
     // print(place.getPlace());
-    return Consumer<Places>(
-      builder: (context, place, child) {
-        return Column(
-          children: [
-        activityscroll(
-                                                      widget.con,
-                                                      widget.sizeWidth,
-                                                      widget.sizeHeight,
-                                                      widget.constr,
-                                                      widget.activityString,
-                                                      widget.arr,
-                                                      widget.pos,
-                                                      widget.currentUserId,
-                                                      place),
-            if(place.getremove()) activitymaps(widget.sizeWidth, widget.sizeHeight, widget.constr, place.getObject(),
-            place.getImagestring()),
-          ],
-        );
-      }
-    );
+    return Consumer<Places>(builder: (context, place, child) {
+      return Column(
+        children: [
+          activityscroll(
+              widget.con,
+              widget.sizeWidth,
+              widget.sizeHeight,
+              widget.constr,
+              widget.activityString,
+              widget.arr,
+              widget.pos,
+              widget.currentUserId,
+              place),
+          if (place.getremove())
+            activitymaps(widget.sizeWidth, widget.sizeHeight, widget.constr,
+                place.getObject(), place.getImagestring()),
+        ],
+      );
+    });
   }
-
 }
