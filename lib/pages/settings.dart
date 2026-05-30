@@ -69,7 +69,7 @@ class _SettingState extends State<Setting> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: Color.fromRGBO(26, 174, 144, 0.6),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: Colors.grey.shade300),
             ),
@@ -87,7 +87,8 @@ class _SettingState extends State<Setting> {
     );
   }
 
-  Widget _buildFriendsSection() {
+  Widget _buildFriendsSection(
+      bool constr, dynamic sizeWidth, dynamic sizeHeight) {
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _communityFriendsFuture,
       builder: (context, snapshot) {
@@ -112,18 +113,27 @@ class _SettingState extends State<Setting> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                'Friends',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+            Align(
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.people, color: Colors.black),
+                  SizedBox(width: sizeWidth / 80),
+                  Text(
+                    'Friends',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: constr ? sizeWidth / 55 : sizeWidth / 22,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'ABeeZee',
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.all(16.0),
               child: _buildFriendChips(friends),
             ),
           ],
@@ -220,6 +230,7 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     final sizeWidth = MediaQuery.of(context).size.width;
+    final sizeHeight = MediaQuery.of(context).size.height;
     final currentUserId = _currentUserId();
 
     return LayoutBuilder(
@@ -326,23 +337,44 @@ class _SettingState extends State<Setting> {
                         settingsContainer(constr, 25.00, sizeWidth, Icons.help,
                             'Help', 'Help center,contact us'),
                         const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Pending community requests',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize:
-                                  constr ? sizeWidth / 55 : sizeWidth / 22,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'ABeeZee',
+                        const Divider(
+                          color: Colors.grey,
+                          height: 36,
+                          thickness: 0.50,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.group_add,
+                                    color: Colors.black),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Community requests',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: constr
+                                        ? sizeWidth / 55
+                                        : sizeWidth / 22,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'ABeeZee',
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                         const SizedBox(height: 8),
                         _buildRequestsSection(),
-                        const SizedBox(height: 16),
-                        _buildFriendsSection(),
+                        const Divider(
+                          color: Colors.grey,
+                          height: 36,
+                          thickness: 0.50,
+                        ),
+                        _buildFriendsSection(constr, sizeWidth, sizeHeight),
                       ],
                     ),
                   ),
