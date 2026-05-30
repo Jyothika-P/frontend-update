@@ -1,19 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:psychesail/model/places.dart';
 import 'package:psychesail/pages/activitymaps.dart';
 import 'package:psychesail/pages/call.dart';
 import 'package:psychesail/pages/history.dart';
+import 'package:psychesail/pages/past_calls.dart';
 import 'package:psychesail/pages/monkeybotchatroom.dart';
 // import 'package:psychesail/pages/serenitychatroom.dart';
 import 'package:psychesail/pages/video_screen.dart';
-import 'package:psychesail/utils/SearchPlacesScreen.dart';
 import 'package:psychesail/utils/local_notifications.dart';
 import './pages/onboarding.dart';
 import './pages/login.dart';
@@ -125,6 +123,7 @@ class MyApp extends StatelessWidget {
           '/settings': (context) => const Setting(),
           '/call_page': (context) => const CallPage(),
           '/progress': (context) => const Progress(),
+          '/past-calls': (context) => const PastCallsPage(),
           '/activity-maps': (context) => ActivityMaps(),
           '/video': (context) => VideoSDKQuickStart(),
         },

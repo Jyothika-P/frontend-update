@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:psychesail/components/crud.dart';
 import 'package:psychesail/pages/paticipant_tile.dart';
 import 'package:videosdk/videosdk.dart';
 import 'room.dart';
@@ -61,11 +58,20 @@ class _RoomScreenState extends State<RoomScreen> {
     });
     _room.on(Events.roomLeft, () {
       participantVideoStreams.clear();
-      if (widget.userId == 'community')
-        deleteCall('Exams', widget.currentId);
-      else
-        deleteCall(widget.userId, widget.currentId);
+      widget.leaveRoom();
     });
+  }
+
+  Future<void> _joinRoom() async {
+    try {
+      await room.join();
+    } catch (error) {
+      debugPrint('An error occured while joining the meeting : $error');
+      widget.leaveRoom();
+      if (mounted) {
+        Navigator.pop(context, 'Room join failed');
+      }
+    }
   }
 
   @override
@@ -92,7 +98,7 @@ class _RoomScreenState extends State<RoomScreen> {
     setRoomEventListener(room);
 
     // Join room
-    room.join();
+    _joinRoom();
   }
 
   @override

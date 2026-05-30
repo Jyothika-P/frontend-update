@@ -1,15 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:psychesail/model/places.dart';
-import 'package:psychesail/model/time.dart';
+import 'package:psychesail/utils/constants.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './button.dart';
-import 'package:animations/animations.dart';
 
 Widget HigthlightText(fontsize, minheight, txt) {
   return Container(
@@ -265,58 +261,6 @@ Widget settingsContainer(constr, rad, sizeWidth, iconUsed, heading, hint) {
   );
 }
 
-Widget _maptextbubble(size) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Container(
-        //     child: Padding(
-        //   padding: EdgeInsets.all(9.0),
-        //   child: RandomAvatar("Serenity",
-        //       trBackground: false, height: 50, width: 50),
-        // )),
-        Flexible(
-          child: Container(
-            padding: const EdgeInsets.all(11),
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                      minHeight: size.height / 3, minWidth: size.width / 4),
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                    image: AssetImage("assets/maps_image.png"),
-                    fit: BoxFit.cover,
-                  )),
-                ),
-                // Text(
-                //   message,
-                //   style: TextStyle(
-                //       color: Colors.black,
-                //       fontSize: 17),
-                // ),
-                // SizedBox(height: 4),
-                const Text(
-                  "https://maps.app.goo.gl/smBnLVPhTkBku2uk8",
-                  style: TextStyle(color: Colors.black, fontSize: 17),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 Widget communityContainer(sizeWidth, sizeHeight, constr, heading, description,
     imagestring, currentid, context) {
   print("inside container");
@@ -516,23 +460,11 @@ Widget callingContainer(sizeWidth, sizeHeight, constr, user) {
   );
 }
 
-Widget activityContainer(context, sizeWidth, sizeHeight, constr, heading,
-    imagestring, pos, currentUserId, Places place) {
-  print(pos);
-  var response;
-
+Widget activityContainer(
+    context, sizeWidth, sizeHeight, constr, heading, imagestring,
+    {required VoidCallback onTap, bool isSelected = false}) {
   return GestureDetector(
-    onTap: () async {
-      place.setPlace(heading);
-      place.setImagestring(imagestring);
-      // print(hello)
-      response = await searchNearbyPlaces(place.getPlace(), pos);
-      // print("take me to hell");
-      print(response);
-      place.setObject(response);
-      place.setremove(true);
-      print(place.getObject());
-    },
+    onTap: onTap,
     child: Container(
       constraints: BoxConstraints(maxWidth: sizeWidth * 0.5),
       decoration: const BoxDecoration(
@@ -664,73 +596,131 @@ Widget historyContainer(
   );
 }
 
-dynamic searchNearbyPlaces(List<String> places_type, pos) async {
-  var responseData;
-  print(pos);
-  // Define the request body as a JSON object
-  var requestBody = {
-    "includedTypes": places_type,
-    "maxResultCount": 5,
-    "locationRestriction": {
-      "circle": {
-        "center": {"latitude": pos[1], "longitude": pos[0]},
-        "radius": 2000.0
-      }
-    }
-  };
-  // print("hellooo");
-  // Encode the request body to JSON
-  var requestBodyJson = jsonEncode(requestBody);
-  print("searching nearby places");
-  // Define the headers
-  var headers = {
-    'Content-Type': 'application/json',
-    'X-Goog-FieldMask': 'places.displayName,places.googleMapsUri'
-  };
-// print("hell");
+Future<dynamic> searchNearbyPlaces(
+  List<String> placesType,
+  List<dynamic> pos,
+) async {
+  double latitude = pos[1];
+  double longitude = pos[0];
+
+  String category = "leisure.park";
+
+  if (placesType.contains("cafe")) {
+    category = "catering.cafe";
+  } else if (placesType.contains("restaurant")) {
+    category = "catering.restaurant";
+  } else if (placesType.contains("movie_theater")) {
+    category = "entertainment.cinema";
+  } else if (placesType.contains("amusement_park") ||
+      placesType.contains("amusement_center") ||
+      placesType.contains("theme_park")) {
+    category = "entertainment";
+  } else if (placesType.contains("park")) {
+    category = "leisure.park";
+  } else if (placesType.contains("garden")) {
+    category = "leisure.park";
+  } else if (placesType.contains("tourist_attraction")) {
+    category = "tourism";
+  }
+
+  const apiKey = MAPS_API;
+
+  final url = "https://api.geoapify.com/v2/places"
+      "?categories=$category"
+      "&filter=circle:$longitude,$latitude,3000"
+      "&limit=10"
+      "&apiKey=$apiKey";
+
   try {
-    // Make the HTTP POST request
-    // Use the API key as a query parameter. If you have restrictions on the key,
-    // verify them in Google Cloud Console (APIs & Services -> Credentials).
-    final placesApiKey = 'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk';
-    var uri = Uri.parse(
-        'https://places.googleapis.com/v1/places:searchNearby?key=$placesApiKey');
-    var response = await http.post(
-      uri,
-      headers: headers,
-      body: requestBodyJson,
-    );
+    final response = await http.get(Uri.parse(url));
 
-    // Check if the request was successful (status code 200)
     if (response.statusCode == 200) {
-      // Parse the response body (assuming it's JSON) into a Map
-      responseData = jsonDecode(response.body);
-      // Process the responseData here
-      print(responseData);
+      final data = jsonDecode(response.body);
 
-      // return responseData;
+      print("Geoapify Response:");
+      print(data);
+
+      return data;
     } else {
-      // Request was not successful
-      print('Request failed with status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      try {
-        responseData = jsonDecode(response.body);
-      } catch (_) {
-        responseData = {
-          'error': {'code': response.statusCode, 'message': response.body}
-        };
-      }
-      if (response.statusCode == 403) {
-        print(
-            '403 Permission denied from Google Places API. Check API key, billing, and API restrictions in Google Cloud Console.');
-      }
+      print("Error: ${response.statusCode}");
+      print(response.body);
+
+      return {"features": []};
     }
   } catch (e) {
-    // Handle any errors that occurred during the HTTP request
-    print('Error occurred: $e');
+    print("Exception: $e");
+
+    return {"features": []};
   }
-  return responseData;
 }
+
+// dynamic searchNearbyPlaces(List<String> places_type, pos) async {
+//   var responseData;
+//   print(pos);
+//   // Define the request body as a JSON object
+//   var requestBody = {
+//     "includedTypes": places_type,
+//     "maxResultCount": 5,
+//     "locationRestriction": {
+//       "circle": {
+//         "center": {"latitude": pos[1], "longitude": pos[0]},
+//         "radius": 2000.0
+//       }
+//     }
+//   };
+//   // print("hellooo");
+//   // Encode the request body to JSON
+//   var requestBodyJson = jsonEncode(requestBody);
+//   print("searching nearby places");
+//   // Define the headers
+//   var headers = {
+//     'Content-Type': 'application/json',
+//     'X-Goog-FieldMask': 'places.displayName,places.googleMapsUri'
+//   };
+// // print("hell");
+//   try {
+//     // Make the HTTP POST request
+//     // Use the API key as a query parameter. If you have restrictions on the key,
+//     // verify them in Google Cloud Console (APIs & Services -> Credentials).
+//     final placesApiKey = 'AIzaSyC1ksDmMNde1jArPaZF1VK-Xad2yFyjjHk';
+//     var uri = Uri.parse(
+//         'https://places.googleapis.com/v1/places:searchNearby?key=$placesApiKey');
+//     var response = await http.post(
+//       uri,
+//       headers: headers,
+//       body: requestBodyJson,
+//     );
+
+//     // Check if the request was successful (status code 200)
+//     if (response.statusCode == 200) {
+//       // Parse the response body (assuming it's JSON) into a Map
+//       responseData = jsonDecode(response.body);
+//       // Process the responseData here
+//       print(responseData);
+
+//       // return responseData;
+//     } else {
+//       // Request was not successful
+//       print('Request failed with status: ${response.statusCode}');
+//       print('Response body: ${response.body}');
+//       try {
+//         responseData = jsonDecode(response.body);
+//       } catch (_) {
+//         responseData = {
+//           'error': {'code': response.statusCode, 'message': response.body}
+//         };
+//       }
+//       if (response.statusCode == 403) {
+//         print(
+//             '403 Permission denied from Google Places API. Check API key, billing, and API restrictions in Google Cloud Console.');
+//       }
+//     }
+//   } catch (e) {
+//     // Handle any errors that occurred during the HTTP request
+//     print('Error occurred: $e');
+//   }
+//   return responseData;
+// }
 
 Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
     imagestring, bordercolor) {
@@ -757,7 +747,7 @@ Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
           InkWell(
               onTap: () => _launchUrl(Uri.parse(googlemapsuri)),
               child: const Text(
-                'Open in Google Maps',
+                'Open Location',
                 style: TextStyle(
                   color: Colors.blue,
                   decoration: TextDecoration.underline,
@@ -779,7 +769,7 @@ format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
 Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
     {Color bordercolor = Colors.grey}) {
   final dynamic placeList =
-      (places is Map && places.containsKey('places')) ? places['places'] : null;
+      (places is Map) ? (places['places'] ?? places['features']) : null;
   if (placeList == null || placeList is! List) {
     return SizedBox.shrink();
   }
@@ -800,16 +790,33 @@ Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
           itemCount: placeList.length,
           itemBuilder: (context, index) {
             final item = placeList[index] as Map? ?? {};
-            final display = (item?['displayName'] is Map &&
-                    item['displayName']!.containsKey('text'))
+            final display = (item.containsKey('displayName') &&
+                    item['displayName'] is Map &&
+                    item['displayName'].containsKey('text'))
                 ? item['displayName']['text']
-                : '';
+                : (item['properties'] is Map &&
+                        item['properties'].containsKey('name'))
+                    ? item['properties']['name']
+                    : (item['properties'] is Map &&
+                            item['properties'].containsKey('formatted'))
+                        ? item['properties']['formatted']
+                        : 'Unknown Place';
+            final googleMapsUri = item.containsKey('googleMapsUri')
+                ? item['googleMapsUri']
+                : (item['properties'] is Map &&
+                        item['properties'].containsKey('osm_url'))
+                    ? item['properties']['osm_url']
+                    : (item['properties'] is Map &&
+                            item['properties'].containsKey('lat') &&
+                            item['properties'].containsKey('lon'))
+                        ? 'https://www.google.com/maps/search/?api=1&query=${item['properties']['lat']},${item['properties']['lon']}'
+                        : '';
             return communitycontainer(
                 sizeWidth,
                 sizeHeight,
                 constr,
                 display.length > 20 ? display.substring(0, 20) : display,
-                item?['googleMapsUri'] ?? '',
+                googleMapsUri,
                 imagestring,
                 bordercolor == Colors.grey
                     ? Colors.grey.shade300

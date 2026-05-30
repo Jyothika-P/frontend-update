@@ -1,11 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:psychesail/components/crud.dart';
 import 'package:psychesail/components/text.dart';
 import 'package:psychesail/components/video.dart';
 import 'package:psychesail/model/emoji.dart';
-import 'package:psychesail/pages/join_room.dart';
 import 'package:psychesail/pages/room_screen.dart';
 
 Widget communityscroll(
@@ -170,7 +168,8 @@ Widget bookscroll(
   );
 }
 
-Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr, user) {
+Widget callingscroll(context, sizeWidth, sizeHeight, constr, title, arr, user,
+    {VoidCallback? onSeeAllTap}) {
   return Wrap(
     spacing: 20,
     runSpacing: min(20, sizeWidth * 0.0006),
@@ -185,7 +184,10 @@ Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr, user) {
                 fontSize: sizeWidth * sizeHeight * 0.000067,
                 fontWeight: FontWeight.bold),
           ),
-          Text("See All", style: TextStyle(color: Colors.black)),
+          InkWell(
+            onTap: onSeeAllTap,
+            child: Text("See All", style: TextStyle(color: Colors.black)),
+          ),
         ],
       ),
       SizedBox(
@@ -199,20 +201,31 @@ Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr, user) {
           shrinkWrap: true,
           itemCount: arr.length,
           itemBuilder: (context, index) {
+            final otherUser = arr[arr.length - 1 - index][0];
+            final roomId = arr[arr.length - 1 - index][1];
             return InkWell(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RoomScreen(
-                      roomId: arr[arr.length - 1 - index][1],
-                      token: token,
-                      leaveRoom: () => {},
-                      currentId: user,
-                      userId: arr[arr.length - 1 - index][0]),
-                ),
-              ),
-              child: callingContainer(sizeWidth, sizeHeight, constr,
-                  arr[arr.length - 1 - index][0]),
+              onTap: () {
+                if (otherUser == 'community') {
+                  Navigator.pushNamed(context, '/video', arguments: {
+                    'currentid': user,
+                    'senderid': 'community',
+                  });
+                  return;
+                }
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RoomScreen(
+                        roomId: roomId,
+                        token: token,
+                        leaveRoom: () => {},
+                        currentId: user,
+                        userId: otherUser),
+                  ),
+                );
+              },
+              child: callingContainer(sizeWidth, sizeHeight, constr, otherUser),
             );
           },
           separatorBuilder: ((context, index) => SizedBox(
@@ -225,9 +238,9 @@ Widget callingscroll(sizeWidth, sizeHeight, constr, title, arr, user) {
 }
 
 Widget activityscroll(context, sizeWidth, sizeHeight, constr, title, arr, pos,
-    currentUserId, place) {
-  print(pos);
-
+    {required Future<void> Function(String heading, String imageString)
+        onCategoryTap,
+    String? selectedHeading}) {
   return Wrap(
     spacing: 20,
     runSpacing: min(20, sizeWidth * 0.0006),
@@ -256,16 +269,18 @@ Widget activityscroll(context, sizeWidth, sizeHeight, constr, title, arr, pos,
           shrinkWrap: true,
           itemCount: arr.length,
           itemBuilder: (context, index) {
+            final heading = arr[arr.length - 1 - index].id;
+            final imageString = arr[arr.length - 1 - index]['url'];
             return activityContainer(
-                context,
-                sizeWidth,
-                sizeHeight,
-                constr,
-                arr[arr.length - 1 - index].id,
-                arr[arr.length - 1 - index]['url'],
-                pos,
-                currentUserId,
-                place);
+              context,
+              sizeWidth,
+              sizeHeight,
+              constr,
+              heading,
+              imageString,
+              onTap: () => onCategoryTap(heading, imageString),
+              isSelected: selectedHeading == heading,
+            );
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),

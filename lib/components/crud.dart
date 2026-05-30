@@ -1,18 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:psychesail/components/text.dart';
 import 'package:psychesail/model/message.dart';
 import 'package:psychesail/model/time.dart';
-import 'package:psychesail/model/userList.dart';
 
 final dateFormatter = DateFormat('yyyy-MM-dd');
 
 final timeFormatter = DateFormat('HH:mm:ss');
 dynamic createRecord(name, email, id, password) async {
-  FirebaseAuth _auth = FirebaseAuth.instance;
   DatabaseReference ref = FirebaseDatabase.instance.ref("/users/$id");
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   var check = await getData(id);
@@ -45,7 +40,6 @@ dynamic createRecord(name, email, id, password) async {
 }
 
 dynamic getData(id) async {
-  final reff = FirebaseDatabase.instance.ref();
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final snapshot = await _firestore.collection('customers').doc(id).get();
   if (snapshot.exists) {
@@ -136,8 +130,6 @@ dynamic getUsers(currentuser) async {
   dynamic activity = await _firestore.collection('activity').get();
   Map<String, String> distinctTimestamps = {};
   List<List<String>> pairList = [];
-  Map<String, String> distinctUsers = {};
-  List<List<String>> callerUsers = [];
   String chatroomid = currentuser + "_" + "Serenity";
   QuerySnapshot querySnapshot = await _firestore
       .collection('chat_rooms')
@@ -171,24 +163,67 @@ dynamic getUsers(currentuser) async {
     print('No documents found in Firestore');
   }
   print(pairList);
-  querySnapshot = await _firestore.collection('calling').get();
+  querySnapshot = await _firestore.collection('call_history').get();
+  List<List<String>> pastCalls = [];
   if (querySnapshot.docs.isNotEmpty) {
     for (DocumentSnapshot doc in querySnapshot.docs) {
-      if (doc.id == currentuser) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        callerUsers
-            .addAll(data.entries.map((e) => [e.key, e.value.toString()]));
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      final callerId = data['callerId']?.toString() ?? '';
+      final calleeId = data['calleeId']?.toString() ?? '';
+
+      if (callerId.isEmpty || calleeId.isEmpty) {
+        continue;
+      }
+
+      if (callerId == currentuser && calleeId == currentuser) {
+        continue;
+      }
+
+      if (callerId == currentuser || calleeId == currentuser) {
+        final startedAt = data['startedAt'];
+        final endedAt = data['endedAt'];
+        final otherUser = callerId == currentuser ? calleeId : callerId;
+        pastCalls.add([
+          otherUser,
+          data['roomId']?.toString() ?? '',
+          startedAt is Timestamp
+              ? DateFormat('EEEE ,d MMMM yyyy').format(startedAt.toDate())
+              : '',
+          startedAt is Timestamp
+              ? DateFormat('HH:mm:ss').format(startedAt.toDate())
+              : '',
+          endedAt is Timestamp
+              ? DateFormat('EEEE ,d MMMM yyyy').format(endedAt.toDate())
+              : '',
+          endedAt is Timestamp
+              ? DateFormat('HH:mm:ss').format(endedAt.toDate())
+              : '',
+          data['active'] == true ? 'active' : 'ended',
+        ]);
       }
     }
   }
-  print(callerUsers);
+  pastCalls.sort((a, b) => b[2].compareTo(a[2]));
+
+  if (pastCalls.isEmpty) {
+    pastCalls.add([
+      'community',
+      'community',
+      '',
+      '',
+      '',
+      '',
+      'ended',
+    ]);
+  }
+  print(pastCalls);
   var stresshistory = await getStressHistory(currentuser);
   return [
     user,
     community.docs,
     activity.docs,
     pairList,
-    callerUsers,
+    pastCalls,
     stresshistory
   ];
 }
@@ -366,6 +401,19 @@ void addCall(String userId, String currentUserId, roomId) {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   _firestore.collection('calling').doc(userId).set({currentUserId: roomId},
       SetOptions(merge: true)).then((res) => print("created"));
+  if (userId != 'Exams' && currentUserId != 'Exams') {
+    _firestore.collection('call_history').doc(roomId).set(
+      {
+        'callerId': currentUserId,
+        'calleeId': userId,
+        'roomId': roomId,
+        'startedAt': Timestamp.now(),
+        'endedAt': null,
+        'active': true,
+      },
+      SetOptions(merge: true),
+    );
+  }
 }
 
 void deleteCall(String userId, String currentUserId) {
@@ -392,4 +440,19 @@ void deleteCall(String userId, String currentUserId) {
         .then((res) => print("deleted"))
         .catchError((error) => print("Error deleting call: $error"));
   }
+}
+
+Future<void> completeCallHistory(String roomId) async {
+  if (roomId.isEmpty) {
+    return;
+  }
+
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  await _firestore.collection('call_history').doc(roomId).set(
+    {
+      'endedAt': Timestamp.now(),
+      'active': false,
+    },
+    SetOptions(merge: true),
+  );
 }

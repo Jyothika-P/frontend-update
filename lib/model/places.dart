@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 
-class Places extends ChangeNotifier{
+class Places extends ChangeNotifier {
   List<String> place = ["hospital"];
   bool val = false;
   bool remove = true;
-  Map<dynamic,dynamic> object = {
-    "places" : [{
-      "googleMapsUri" : "Disha",
-      "displayName" : {
-        "text" : "fast",
-        "languageCode" : "en"
+  Map<dynamic, dynamic> object = {
+    "places": [
+      {
+        "googleMapsUri": "Disha",
+        "displayName": {"text": "fast", "languageCode": "en"}
       }
-    }]
+    ]
   };
   String imagestring = "assets/group_dp.png";
-  Map<String,List<String>> _placeToFind = {
-    "Movies" : ["movie_theater"],
-    "Games" : ["amusement_park","amusement_center"],
-    "Cafe" : ["cafe","restaurant"]
+  Map<String, List<String>> _placeToFind = {
+    "Movies": ["movie_theater"],
+    "Games": ["amusement_park", "amusement_center", "theme_park"],
+    "Cafe": ["cafe", "restaurant"],
+    "Parks": ["park", "garden"],
+    "Tourism": ["tourist_attraction"]
   };
   Places();
 
   void setPlace(String place) {
-    this.place =  _placeToFind[place] ?? ["hospital"];
+    this.place = _placeToFind[place] ?? ["hospital"];
+  }
+
+  List<String> getCategoriesFor(String place) {
+    return _placeToFind[place] ?? ["hospital"];
   }
 
   List<String> getPlace() {
@@ -54,7 +59,11 @@ class Places extends ChangeNotifier{
   }
 
   void setObject(obj) {
-    object["places"] = obj["places"];
+    if (obj is Map) {
+      object["places"] = obj["places"] ?? obj["features"] ?? [];
+    } else {
+      object["places"] = [];
+    }
     notifyListeners();
   }
 

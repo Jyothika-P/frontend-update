@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,9 +41,9 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
   final ChatBloc chatbloc = ChatBloc();
   List<String> userinputs = [];
   List<List<String>> arr = [
-    ["Movies", "assets/movie.png"],
-    ["Games", "assets/games.png"],
-    ["Cafe", "assets/cafe.png"]
+    ["Parks", "assets/park.png"],
+    ["Cafe", "assets/cafe.png"],
+    ["Museums", "assets/museum.png"]
   ];
   var lastmessage;
   var receiverid;
@@ -78,6 +79,53 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     super.initState();
     endchat = false;
     initializeTts();
+  }
+
+  Future<void> _fetchStressScore(List<String> userinputs) async {
+    print("FETCH STRESS CALLED");
+    // Select host depending on platform/emulator
+    String host = '127.0.0.1';
+    if (Platform.isAndroid) {
+      // Android emulator (Android Studio) maps host machine's localhost to 10.0.2.2
+      host = '10.0.2.2';
+    }
+    // Android emulators should use 10.0.2.2 to reach host machine
+    try {
+      // Debug print
+      print("host is" + host);
+      print(
+          'Calling backend with inputs: ${jsonEncode({"inputs": userinputs})}');
+      var url = Uri.parse('http://' + host + ':8000/process_data');
+      var response = await http.post(
+        url,
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": 'true',
+          "Access-Control-Allow-Headers":
+              "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+          "Access-Control-Allow-Methods": "GET, POST,OPTIONS"
+        },
+        body: jsonEncode({"inputs": userinputs}),
+      );
+
+      print('Backend response status: ${response.statusCode}');
+      print('Backend response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        var decode_score = jsonDecode(response.body);
+        var stress_score = decode_score["average_stress"].toString();
+        print('Decoded stress: $stress_score');
+        setState(() {
+          stressScore = stress_score;
+        });
+        addStressValue(currentid, stressScore);
+      } else {
+        print('Failed to send data. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending data: $e');
+    }
   }
 
   void initializeTts() {
@@ -119,46 +167,46 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     print(lastmessage);
     print(currentid);
 
-    Future<void> _fetchStressScore(userinputs) async {
-      var url = Uri.parse('http://192.168.197.137:8000/process_data');
-      try {
-        print("Sending request...");
-        print(jsonEncode({"inputs": userinputs}));
-        var response = await http.post(
-          url,
-          headers: {
-            "content-type": "application/json",
-            "Access-Control-Allow-Origin":
-                "*", // Required for CORS support to work
-            "Access-Control-Allow-Credentials":
-                'true', // Required for cookies, authorization headers with HTTPS
-            "Access-Control-Allow-Headers":
-                "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
-            "Access-Control-Allow-Methods": "GET, POST,OPTIONS"
-          },
-          body: jsonEncode({"inputs": userinputs}),
-        );
-        if (response.statusCode == 200) {
-          print("Data sent successfully");
-          print("Response from server: ${response.body}");
+    // Future<void> _fetchStressScore(userinputs) async {
+    //   var url = Uri.parse('http://127.0.0.1:8000/process_data');
+    //   try {
+    //     print("Sending request...");
+    //     print(jsonEncode({"inputs": userinputs}));
+    //     var response = await http.post(
+    //       url,
+    //       headers: {
+    //         "content-type": "application/json",
+    //         "Access-Control-Allow-Origin":
+    //             "*", // Required for CORS support to work
+    //         "Access-Control-Allow-Credentials":
+    //             'true', // Required for cookies, authorization headers with HTTPS
+    //         "Access-Control-Allow-Headers":
+    //             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+    //         "Access-Control-Allow-Methods": "GET, POST,OPTIONS"
+    //       },
+    //       body: jsonEncode({"inputs": userinputs}),
+    //     );
+    //     if (response.statusCode == 200) {
+    //       print("Data sent successfully");
+    //       print("Response from server: ${response.body}");
 
-          var decode_score = jsonDecode(response.body);
-          var stress_score = decode_score["Final Stress Level"];
-          print(stress_score);
-          setState(() {
-            stressScore = stress_score;
-          });
+    //       var decode_score = jsonDecode(response.body);
+    //       var stress_score = decode_score["average_stress"].toString();
+    //       print(stress_score);
+    //       setState(() {
+    //         stressScore = stress_score;
+    //       });
 
-          // update in customers
-          addStressValue(currentid, stressScore);
-        } else {
-          print("Failed to send data. Status code: ${response.statusCode}");
-          print("Response body: ${response.body}");
-        }
-      } catch (e) {
-        print("Error sending data: $e");
-      }
-    }
+    //       // update in customers
+    //       addStressValue(currentid, stressScore);
+    //     } else {
+    //       print("Failed to send data. Status code: ${response.statusCode}");
+    //       print("Response body: ${response.body}");
+    //     }
+    //   } catch (e) {
+    //     print("Error sending data: $e");
+    //   }
+    // }
 
     dynamic sendMessage(messages) async {
       print("Entered send messages");
@@ -324,7 +372,7 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                       color: (messages[index]
                                                                   .role ==
                                                               "user")
-                                                          ? Colors.white
+                                                          ? Colors.grey[700]
                                                           : Colors.black,
                                                       fontSize: 17,
                                                     ),
@@ -423,7 +471,7 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                         color: (messages[index]
                                                                     .role ==
                                                                 "user")
-                                                            ? Colors.white
+                                                            ? Colors.grey[700]
                                                             : Colors.black,
                                                         fontSize: 17,
                                                       ),
@@ -495,16 +543,25 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                                         onTap: () async {
                                                           print("hello");
                                                           print(userinputs);
-                                                          setState(() {
-                                                            endchat = true;
-                                                          });
                                                           print(jsonEncode({
                                                             "inputs": userinputs
                                                           }));
+                                                          print(
+                                                              "END CHAT CLICKED");
+                                                          print(userinputs);
+
+                                                          print(
+                                                              "FETCH COMPLETE");
+
                                                           await _fetchStressScore(
                                                               userinputs);
                                                           print(
+                                                              "Stress Score FETCH COMPLETE");
+                                                          print(
                                                               "after sending and fetching response");
+                                                          setState(() {
+                                                            endchat = true;
+                                                          });
                                                         },
                                                         child: (!endchat &&
                                                                 !suggestplaces)
@@ -1056,37 +1113,6 @@ Widget _endchat(
                     ),
                   )
                 ],
-              ),
-            ),
-            SizedBox(
-              width: sizeWidth,
-              height: sizeHeight / 20,
-              child: Container(
-                color: Colors.black,
-                child: InkWell(
-                  onTap: () async {
-                    var chatid = await fetchChatId(messages);
-                    Navigator.pushNamed(context, '/chatroom', arguments: {
-                      'currentuser': currentid,
-                      'receiverid': 'Disha',
-                      'communityname': 'community',
-                      'name': 'Stress $stressScore',
-                      'chatId': chatid
-                    });
-                  },
-                  child: Center(
-                    child: Text(
-                      "Connect & Heal: Join Tailored Stress-Matched Circle",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'AbeeZee',
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
               ),
             )
           ],

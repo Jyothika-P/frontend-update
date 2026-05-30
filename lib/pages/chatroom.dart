@@ -64,17 +64,18 @@ class _ChatRoomState extends State<ChatRoom> {
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
           title: Center(child: Text(name)),
           actions: [
-            Padding(
-                padding: EdgeInsets.only(right: size.width / 50),
-                child: IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/video', arguments: {
-                        'currentid': currentid,
-                        'senderid': 'community'
-                      });
-                    },
-                    icon: Icon(Icons.call),
-                    color: Colors.white))
+            if (communityname != 'community')
+              Padding(
+                  padding: EdgeInsets.only(right: size.width / 50),
+                  child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/video', arguments: {
+                          'currentid': currentid,
+                          'senderid': 'community'
+                        });
+                      },
+                      icon: Icon(Icons.call),
+                      color: Colors.white))
           ],
         ),
         body: Column(children: [
@@ -252,7 +253,7 @@ class _ChatRoomState extends State<ChatRoom> {
                         data['message'],
                         style: TextStyle(
                           color: (data['senderid'] == currentid)
-                              ? Colors.black
+                              ? Colors.grey[700]
                               : Colors.white,
                           fontSize: 17,
                         ),

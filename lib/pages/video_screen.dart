@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:psychesail/components/video.dart';
-import 'package:psychesail/pages/join_room.dart';
 import 'package:psychesail/pages/room_screen.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -14,21 +13,32 @@ class VideoSDKQuickStart extends StatefulWidget {
 }
 
 class _VideoSDKQuickStartState extends State<VideoSDKQuickStart> {
-  String roomId = "";
-  bool isRoomActive = false;
+  late Future<String> _roomFuture;
+  String? _currentUserId;
+  String? _senderUserId;
+  String? _createdRoomId;
+  bool _isCommunityCall = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_senderUserId != null) {
+      return;
+    }
+
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+
+    _currentUserId = args?['currentid'] ?? "";
+    _senderUserId = args?['senderid'] ?? "";
+    _isCommunityCall = _senderUserId == 'community';
+    _roomFuture = _initRoom(_currentUserId!, _senderUserId!);
+  }
 
   @override
   Widget build(BuildContext context) {
-    double sizeHeight = MediaQuery.of(context).size.height;
     double sizeWidth = MediaQuery.of(context).size.width;
-    var currentUserId = '';
-    var senderUserId = '';
-    final Map<String, dynamic>? args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-    // Access individual parameters
-
-    currentUserId = args?['currentid'] ?? "";
-    senderUserId = args?['senderid'] ?? "";
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -38,7 +48,7 @@ class _VideoSDKQuickStartState extends State<VideoSDKQuickStart> {
           Padding(
               padding: EdgeInsets.symmetric(horizontal: sizeWidth / 20),
               child: RandomAvatar(
-                currentUserId,
+                _currentUserId ?? "",
                 trBackground: false,
                 height: 50,
                 width: 50,
@@ -46,7 +56,7 @@ class _VideoSDKQuickStartState extends State<VideoSDKQuickStart> {
         ],
       ),
       body: FutureBuilder<dynamic>(
-          future: calling(currentUserId, senderUserId),
+          future: _roomFuture,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
@@ -60,38 +70,57 @@ class _VideoSDKQuickStartState extends State<VideoSDKQuickStart> {
                 if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
+                  final roomId = snapshot.data as String;
+                  _createdRoomId = roomId;
                   return Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: RoomScreen(
-                        roomId: snapshot.data,
+                        roomId: roomId,
                         token: token,
-                        leaveRoom: () {},
-                        currentId: currentUserId,
-                        userId: senderUserId,
+                        leaveRoom: _cleanupCall,
+                        currentId: _currentUserId ?? "",
+                        userId: _senderUserId ?? "",
                       ));
                 }
             }
           }),
     );
   }
+
+  void _cleanupCall() async {
+    final currentUserId = _currentUserId;
+    final senderUserId = _senderUserId;
+
+    if (currentUserId == null || senderUserId == null) {
+      return;
+    }
+
+    if (!_isCommunityCall) {
+      await completeCallHistory(_createdRoomId ?? '');
+    }
+
+    if (senderUserId == 'community') {
+      deleteCall('Exams', currentUserId);
+    } else {
+      deleteCall(senderUserId, currentUserId);
+    }
+  }
 }
 
-calling(currentUserId, senderId) async {
-  dynamic roomId = await createRoom();
+Future<String> _initRoom(String currentUserId, String senderId) async {
   if (senderId == 'community') {
-    print("start");
+    final roomId = await getCommunityRoomId();
+    print('Using shared community room: $roomId');
     var snapshot = await getcommunityconstmessages(currentUserId, 'Exams');
     print(snapshot);
-//     for (var docSnapshot in snapshot) {
-//       print("no" + docSnapshot);
-//  var docDataRaw = docSnapshot.data();
-//  listOfPeople.add(docDataRaw['senderid']);
-//   }
     snapshot.forEach((element) {
       addCall(element, 'Exams', roomId);
     });
-//   } else
     addCall(senderId, currentUserId, roomId);
     return roomId;
   }
+
+  final roomId = await createRoom();
+  addCall(senderId, currentUserId, roomId);
+  return roomId;
 }

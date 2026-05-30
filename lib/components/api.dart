@@ -134,34 +134,33 @@ Future<dynamic> buildAPI() async {
   return [filteredList, listVideo];
 }
 
-Future<dynamic> fetchChatId(userinputs) async {
-  var url = Uri.parse('http://192.168.197.137:8000/getChatRoomID');
-  try {
-    print("Sending request...");
-    print(jsonEncode({"inputs": userinputs}));
-    var response = await http.post(
-      url,
-      headers: {
-        "content-type": "application/json",
-        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        "Access-Control-Allow-Credentials":
-            'true', // Required for cookies, authorization headers with HTTPS
-        "Access-Control-Allow-Headers":
-            "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
-        "Access-Control-Allow-Methods": "GET, POST,OPTIONS"
-      },
-      body: jsonEncode({"inputs": userinputs}),
-    );
-    if (response.statusCode == 200) {
-      print("Data sent successfully");
-      print("Response from server: ${response.body}");
-
-      return jsonDecode(response.body);
-    } else {
-      print("Failed to send data. Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
-    }
-  } catch (e) {
-    print("Error sending data: $e");
-  }
-}
+// Future<dynamic> fetchChatId(userinputs) async {
+//   var url = Uri.parse('http://192.168.197.137:8000/getChatRoomID');
+//   try {
+//     print("Sending request...");
+//     print(jsonEncode({"inputs": userinputs}));
+//     var response = await http.post(
+//       url,
+//       headers: {
+//         "content-type": "application/json",
+//         "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+//         "Access-Control-Allow-Credentials":
+//             'true', // Required for cookies, authorization headers with HTTPS
+//         "Access-Control-Allow-Headers":
+//             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+//         "Access-Control-Allow-Methods": "GET, POST,OPTIONS"
+//       },
+//       body: jsonEncode({"inputs": userinputs}),
+//     );
+//     if (response.statusCode == 200) {
+//       print("Data sent successfully");
+//       print("Response from server: ${response.body}");
+//       return jsonDecode(response.body);
+//     } else {
+//       print("Failed to send data. Status code: ${response.statusCode}");
+//       print("Response body: ${response.body}");
+//     }
+//   } catch (e) {
+//     print("Error sending data: $e");
+//   }
+// }

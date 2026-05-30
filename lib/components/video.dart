@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIwYzdlZWNlNS04MTUyLTQyODQtODBmOC1iZTJjMzVlZWU0MGMiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcxNDI2ODE2MSwiZXhwIjoxNzQ1ODA0MTYxfQ.WeeRpIwQx6ftJ3KMXA7hUda8KnqHO9-SNCjXOWRxk0o";
@@ -12,10 +14,37 @@ Future<String> createRoom() async {
       url,
       headers: headers,
     );
-    print(json.decode(httpResponse.body));
-    return json.decode(httpResponse.body)['roomId'];
+    final decodedBody = json.decode(httpResponse.body);
+    print(decodedBody);
+    if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
+      final createdRoomId = decodedBody['roomId'];
+      if (createdRoomId is String && createdRoomId.isNotEmpty) {
+        return createdRoomId;
+      }
+    }
+    throw Exception(
+        'Failed to create VideoSDK room: ${httpResponse.statusCode} ${httpResponse.body}');
   } catch (e) {
     print("Error : ${e}");
+    rethrow;
   }
-  return "";
+}
+
+Future<String> getCommunityRoomId() async {
+  final firestore = FirebaseFirestore.instance;
+  final roomRef = firestore.collection('video_room_meta').doc('community');
+  final snapshot = await roomRef.get();
+
+  final existingRoomId = snapshot.data()?['roomId']?.toString();
+  if (snapshot.exists && existingRoomId != null && existingRoomId.isNotEmpty) {
+    return existingRoomId;
+  }
+
+  final roomId = await createRoom();
+  await roomRef.set({
+    'roomId': roomId,
+    'updatedAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+
+  return roomId;
 }
