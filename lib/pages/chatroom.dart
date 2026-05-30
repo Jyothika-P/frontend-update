@@ -1,14 +1,9 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../components/button.dart';
-import '../model/textField.dart';
 import '../components/crud.dart';
-import '../components/text.dart';
-import '../model/message.dart';
 
 class ChatRoom extends StatefulWidget {
   const ChatRoom({
@@ -21,22 +16,274 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _messageController = TextEditingController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   DatabaseReference reff = FirebaseDatabase.instance.ref("/users");
 
   var receiveremail;
   var receiverid;
   var currentid;
   var communityname;
+  var chatmode;
+  var chatroomId;
+  bool _privateHistoryTrimmed = false;
 
-  dynamic _sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await sendcommunitymessage(
-          _messageController.text, currentid, communityname);
-      _messageController.clear();
-      return true;
+  Future<List<String>> _loadCommunityMembers() async {
+    final members = await getcommunityconstmessages(currentid, communityname);
+    final List<String> memberList = members is Set
+        ? members.map((member) => member.toString()).toList()
+        : List<String>.from(members);
+
+    memberList.removeWhere(
+        (member) => member.isEmpty || member == currentid || member == 'Disha');
+    memberList.sort();
+    return memberList;
+  }
+
+  Future<void> _openFriendSheet() async {
+    if (communityname == 'community') {
+      return;
     }
-    return;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: FutureBuilder<List<String>>(
+            future: _loadCommunityMembers(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  height: 280,
+                  child: Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                );
+              }
+
+              if (snapshot.hasError) {
+                return SizedBox(
+                  height: 280,
+                  child: Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              }
+
+              final members = snapshot.data ?? [];
+              if (members.isEmpty) {
+                return const SizedBox(
+                  height: 280,
+                  child: Center(
+                    child: Text(
+                      'No community members found',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              }
+
+              return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.65,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Community friends',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: members.length,
+                        separatorBuilder: (_, __) => const Divider(
+                          color: Colors.white24,
+                        ),
+                        itemBuilder: (context, index) {
+                          final member = members[index];
+                          return FutureBuilder<String>(
+                            future: getCommunityFriendState(
+                              communityname,
+                              currentid,
+                              member,
+                            ),
+                            builder: (context, relationSnapshot) {
+                              final relation = relationSnapshot.data ?? 'none';
+                              final isLoading =
+                                  relationSnapshot.connectionState ==
+                                      ConnectionState.waiting;
+
+                              String buttonLabel = 'Add Friend';
+                              VoidCallback? onPressed;
+
+                              if (relation == 'accepted') {
+                                buttonLabel = 'Call';
+                                onPressed = () {
+                                  Navigator.pop(sheetContext);
+                                  Navigator.pushNamed(context, '/video',
+                                      arguments: {
+                                        'currentid': currentid,
+                                        'senderid': member,
+                                      });
+                                };
+                              } else if (relation == 'pending_sent') {
+                                buttonLabel = 'Requested';
+                              } else if (relation == 'pending_received') {
+                                buttonLabel = 'Accept';
+                                onPressed = () async {
+                                  await acceptCommunityFriendRequest(
+                                    communityname,
+                                    member,
+                                    currentid,
+                                  );
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                };
+                              } else {
+                                onPressed = () async {
+                                  await sendCommunityFriendRequest(
+                                    communityname,
+                                    currentid,
+                                    member,
+                                  );
+                                  if (mounted) {
+                                    setState(() {});
+                                  }
+                                };
+                              }
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  member,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                subtitle: Text(
+                                  relation == 'accepted'
+                                      ? 'Friend accepted'
+                                      : relation == 'pending_sent'
+                                          ? 'Request sent'
+                                          : relation == 'pending_received'
+                                              ? 'Wants to connect'
+                                              : 'No request yet',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                                trailing: isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : TextButton(
+                                        onPressed: onPressed,
+                                        child: Text(buttonLabel),
+                                      ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _trimPrivateHistoryIfNeeded() async {
+    if (_privateHistoryTrimmed ||
+        chatroomId == null ||
+        chatroomId.toString().isEmpty) {
+      return;
+    }
+    _privateHistoryTrimmed = true;
+    await trimChatHistory(chatroomId.toString());
+  }
+
+  Widget _buildPrivateMessageList(double sizeWidth, double sizeHeight) {
+    return StreamBuilder(
+      stream: getmessages(currentid, receiverid),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error${snapshot.error}');
+        }
+
+        final documents = snapshot.data == null ? [] : snapshot.data!.docs;
+        return ListView.builder(
+          itemCount: documents.length,
+          itemBuilder: (context, index) {
+            return _buildMessageItem(
+              documents[index],
+              currentid,
+              sizeWidth,
+              sizeHeight,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPrivateChatBody(double sizeHeight, double sizeWidth) {
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            color: Colors.white,
+            child: _buildPrivateMessageList(sizeWidth, sizeHeight),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(
+              vertical: sizeHeight / 80, horizontal: sizeWidth / 40),
+          height: sizeHeight / 8.6,
+          color: Colors.white,
+          child: Row(
+            children: [
+              _chatField(_messageController),
+              const SizedBox(width: 9),
+              InkWell(
+                onTap: () async {
+                  if (_messageController.text.isNotEmpty) {
+                    await sendmessage(
+                        receiverid, _messageController.text, currentid);
+                    _messageController.clear();
+                    await trimChatHistory(chatroomId.toString());
+                  }
+                },
+                child: const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.black,
+                  child: Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -53,11 +300,37 @@ class _ChatRoomState extends State<ChatRoom> {
     currentid = args?['currentid'] ?? '';
     receiverid =
         args?['receiverid'] ?? ((currentid == 'Joe') ? 'Disha' : 'Joe');
+    chatmode = args?['chatmode'] ?? 'community';
+    chatroomId =
+        args?['chatroomId'] ?? getDirectChatRoomId(currentid, receiverid);
     var name = args?['name'] ?? "Exams";
-    var chatid = args?['chatid'] ?? "-1";
     print(receiverid);
     print(communityname);
     print(currentid);
+
+    if (chatmode == 'private') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _trimPrivateHistoryIfNeeded();
+      });
+
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
+          title: Center(child: Text(receiverid)),
+        ),
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/chat_background_1.jpeg"),
+              fit: BoxFit.cover,
+              opacity: 0.92,
+            ),
+          ),
+          child: _buildPrivateChatBody(sizeHeight, sizeWidth),
+        ),
+      );
+    }
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
@@ -68,13 +341,8 @@ class _ChatRoomState extends State<ChatRoom> {
               Padding(
                   padding: EdgeInsets.only(right: size.width / 50),
                   child: IconButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/video', arguments: {
-                          'currentid': currentid,
-                          'senderid': 'community'
-                        });
-                      },
-                      icon: Icon(Icons.call),
+                      onPressed: _openFriendSheet,
+                      icon: Icon(Icons.person_add_alt_1),
                       color: Colors.white))
           ],
         ),
@@ -152,7 +420,6 @@ class _ChatRoomState extends State<ChatRoom> {
             documents = [];
           } else {
             documents = snapshot.data!.docs;
-            Map<Timestamp, dynamic> arr = {};
             for (var docSnapshot in documents) {
               var docDataRaw = docSnapshot.data();
               print(docDataRaw);
@@ -177,17 +444,8 @@ class _ChatRoomState extends State<ChatRoom> {
     print("POPOPOPOO");
     print(document.data());
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
-    var alignment = (data['senderid'] == currentid)
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
-    var bgcolor = (data['senderid'] == currentid)
-        ? Color.fromRGBO(32, 160, 144, 100)
-        : Color.fromRGBO(121, 124, 123, 100);
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      bool constr = false;
-      if (constraints.maxWidth > 600) constr = true;
       return Column(
         crossAxisAlignment: (data['senderid'] == currentid)
             ? CrossAxisAlignment.end

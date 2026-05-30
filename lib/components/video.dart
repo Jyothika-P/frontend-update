@@ -30,21 +30,21 @@ Future<String> createRoom() async {
   }
 }
 
-Future<String> getCommunityRoomId() async {
-  final firestore = FirebaseFirestore.instance;
-  final roomRef = firestore.collection('video_room_meta').doc('community');
-  final snapshot = await roomRef.get();
+// Future<String> getCommunityRoomId() async {
+//   final firestore = FirebaseFirestore.instance;
+//   final roomRef = firestore.collection('video_room_meta').doc('community');
+//   final snapshot = await roomRef.get();
 
-  final existingRoomId = snapshot.data()?['roomId']?.toString();
-  if (snapshot.exists && existingRoomId != null && existingRoomId.isNotEmpty) {
-    return existingRoomId;
-  }
+//   final existingRoomId = snapshot.data()?['roomId']?.toString();
+//   if (snapshot.exists && existingRoomId != null && existingRoomId.isNotEmpty) {
+//     return existingRoomId;
+//   }
 
-  final roomId = await createRoom();
-  await roomRef.set({
-    'roomId': roomId,
-    'updatedAt': FieldValue.serverTimestamp(),
-  }, SetOptions(merge: true));
+//   final roomId = await createRoom();
+//   await roomRef.set({
+//     'roomId': roomId,
+//     'updatedAt': FieldValue.serverTimestamp(),
+//   }, SetOptions(merge: true));
 
-  return roomId;
-}
+//   return roomId;
+// }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:random_avatar/random_avatar.dart';
-import '../components/button.dart';
+
+import '../components/crud.dart';
 import '../components/text.dart';
+
 class Setting extends StatefulWidget {
   const Setting({super.key});
 
@@ -10,130 +12,376 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
-  @override
-  Widget build(BuildContext context) {
-    double sizeHeight = MediaQuery.of(context).size.height;
-    double sizeWidth = MediaQuery.of(context).size.width;
-    var currentUserId = '';
+  Future<List<Map<String, dynamic>>>? _pendingRequestsFuture;
+  Future<List<Map<String, dynamic>>>? _communityFriendsFuture;
+
+  String _currentUserId() {
     final Map<String, dynamic>? args =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-    // Access individual parameters
-    currentUserId = args?['currentid'] ?? "";
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          bool constr = false;
-          if (constraints.maxWidth > 600) constr = true;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    return args?['currentid']?.toString() ?? '';
+  }
 
-          return Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                title: Text("Settings"),
+  void _refreshFutures() {
+    final currentUserId = _currentUserId();
+    _pendingRequestsFuture = getPendingCommunityFriendRequests(currentUserId);
+    _communityFriendsFuture = getCommunityFriendsForUser(currentUserId);
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_pendingRequestsFuture == null || _communityFriendsFuture == null) {
+      _refreshFutures();
+    }
+  }
+
+  Future<void> _acceptRequest(
+      String communityId, String fromId, String toId) async {
+    await acceptCommunityFriendRequest(communityId, fromId, toId);
+    setState(_refreshFutures);
+  }
+
+  Widget _buildFriendChips(List<Map<String, dynamic>> friends) {
+    if (friends.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text(
+          'No friends yet',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: friends.map((friend) {
+        final friendId = friend['friendId']?.toString() ?? '';
+        return InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, '/chatroom', arguments: {
+              'currentid': _currentUserId(),
+              'receiverid': friendId,
+              'chatmode': 'private',
+              'chatroomId': getDirectChatRoomId(_currentUserId(), friendId),
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Text(
+              friendId,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
               ),
-              body: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(50.0),
-                            topRight: Radius.circular(50.0))),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFriendsSection() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _communityFriendsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(color: Colors.black),
+            ),
+          );
+        }
+
+        final friends = snapshot.data ?? [];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text(
+                'Friends',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _buildFriendChips(friends),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRequestsSection() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _pendingRequestsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(color: Colors.black),
+            ),
+          );
+        }
+
+        final requests = snapshot.data ?? [];
+        if (requests.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(
+              'No requests',
+              style: TextStyle(color: Colors.grey),
+            ),
+          );
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: requests.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final request = requests[index];
+            final communityId = request['communityId']?.toString() ?? '';
+            final fromId = request['fromId']?.toString() ?? '';
+            final toId = request['toId']?.toString() ?? '';
+
+            return Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: sizeWidth / 2.3),
-                          child: Divider(
-                            color: const Color.fromARGB(255, 201, 195, 195),
-                            height: 36,
-                            thickness: 3,
+                        Text(
+                          fromId,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        const SizedBox(height: 4),
+                        Text(
+                          'Community: $communityId',
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _acceptRequest(communityId, fromId, toId),
+                    child: const Text('Accept'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sizeWidth = MediaQuery.of(context).size.width;
+    final currentUserId = _currentUserId();
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final constr = constraints.maxWidth > 600;
+
+        return Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: const Text('Settings'),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50.0),
+                  topRight: Radius.circular(50.0),
+                ),
+              ),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: sizeWidth / 2.3),
+                    child: const Divider(
+                      color: Color.fromARGB(255, 201, 195, 195),
+                      height: 36,
+                      thickness: 3,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: sizeWidth / 4,
+                          child: RandomAvatar(
+                            currentUserId,
+                            trBackground: false,
+                            height: 50,
+                            width: 50,
+                          ),
+                        ),
+                        SizedBox(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
-                              Container(
-                                width: sizeWidth/4,
-                                child: RandomAvatar(currentUserId, trBackground: false, height: 50,width: 50)
+                              Text(
+                                currentUserId,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize:
+                                      constr ? sizeWidth / 40 : sizeWidth / 20,
+                                  fontStyle: FontStyle.italic,
+                                  fontFamily: 'ABeeZee',
+                                ),
                               ),
-                              SizedBox(
-
-
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(currentUserId,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: constr ? sizeWidth / 40 : sizeWidth / 20,
-                                        fontStyle: FontStyle.italic,
-                                        fontFamily: 'ABeeZee',
-
-                                      ),),
-                                    Text("Never give up",
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: constr ? sizeWidth / 40 : sizeWidth / 20,
-                                        fontStyle: FontStyle.italic,
-                                        fontFamily: 'ABeeZee',
-                                      ),
-                                    )
-                                  ],
+                              Text(
+                                'Never give up',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize:
+                                      constr ? sizeWidth / 40 : sizeWidth / 20,
+                                  fontStyle: FontStyle.italic,
+                                  fontFamily: 'ABeeZee',
                                 ),
                               )
-                            ],),
-                        ),
-                        Divider(
-                          color: Colors.grey,
-                          height: 36,
-                          thickness: 0.50,
-                        ),
-                       SingleChildScrollView(
-                         child: Padding(
-                           padding: const EdgeInsets.all(8.0),
-                           child: Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                             children: [
-                               settingsContainer(constr,25.00,sizeWidth,Icons.key_outlined,"Accounts","Privacy,security"),
-                               settingsContainer(constr,25.00,sizeWidth,Icons.chat,"Chat","Chat history,theme"),
-                               settingsContainer(constr,25.00,sizeWidth,Icons.notifications,"Notifications","Messages and others"),
-                               settingsContainer(constr,25.00,sizeWidth,Icons.help,"Help","Help center,contact us"),
-                             ],
-                           ),
-
-
-                         )
-                       ),
+                            ],
+                          ),
+                        )
                       ],
-                    )),
+                    ),
+                  ),
+                  const Divider(
+                    color: Colors.grey,
+                    height: 36,
+                    thickness: 0.50,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        settingsContainer(constr, 25.00, sizeWidth,
+                            Icons.key_outlined, 'Accounts', 'Privacy,security'),
+                        settingsContainer(constr, 25.00, sizeWidth, Icons.chat,
+                            'Chat', 'Chat history,theme'),
+                        settingsContainer(
+                            constr,
+                            25.00,
+                            sizeWidth,
+                            Icons.group_add,
+                            'Community Requests',
+                            'Accept friends before calls'),
+                        settingsContainer(
+                            constr,
+                            25.00,
+                            sizeWidth,
+                            Icons.notifications,
+                            'Notifications',
+                            'Messages and others'),
+                        settingsContainer(constr, 25.00, sizeWidth, Icons.help,
+                            'Help', 'Help center,contact us'),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Pending community requests',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  constr ? sizeWidth / 55 : sizeWidth / 22,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'ABeeZee',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildRequestsSection(),
+                        const SizedBox(height: 16),
+                        _buildFriendsSection(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              bottomNavigationBar: BottomNavigationBar(
-                  unselectedItemColor: Color.fromRGBO(35, 154, 139, 75),
-                  fixedColor: Color.fromRGBO(35, 154, 139, 75),
-                  backgroundColor: Colors.white,
-                  items: [
-                    BottomNavigationBarItem(
-                      icon: Icon(
-                        Icons.message,
-                        color: Color.fromRGBO(35, 154, 139, 75),
-                      ),
-                      label: "Message",
-                    ),
-                    BottomNavigationBarItem(
-                      icon:
-                      Icon(Icons.call, color: Color.fromRGBO(35, 154, 139, 75)),
-                      label: "Calls",
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.settings,
-                          color: Color.fromRGBO(35, 154, 139, 75)),
-                      label: "Settings",
-                    ),
-                  ]));
-        });
+            ),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            unselectedItemColor: const Color.fromRGBO(35, 154, 139, 75),
+            fixedColor: const Color.fromRGBO(35, 154, 139, 75),
+            backgroundColor: Colors.white,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.message,
+                  color: Color.fromRGBO(35, 154, 139, 75),
+                ),
+                label: 'Message',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.call,
+                  color: Color.fromRGBO(35, 154, 139, 75),
+                ),
+                label: 'Calls',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.settings,
+                  color: Color.fromRGBO(35, 154, 139, 75),
+                ),
+                label: 'Settings',
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
-format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+
+format(Duration d) => d.toString().split('.').first.padLeft(8, '0');

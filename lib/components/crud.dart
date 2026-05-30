@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:psychesail/model/message.dart';
 import 'package:psychesail/model/time.dart';
@@ -165,6 +167,7 @@ dynamic getUsers(currentuser) async {
   print(pairList);
   querySnapshot = await _firestore.collection('call_history').get();
   List<List<String>> pastCalls = [];
+  final Set<String> seenCallKeys = {};
   if (querySnapshot.docs.isNotEmpty) {
     for (DocumentSnapshot doc in querySnapshot.docs) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -183,9 +186,11 @@ dynamic getUsers(currentuser) async {
         final startedAt = data['startedAt'];
         final endedAt = data['endedAt'];
         final otherUser = callerId == currentuser ? calleeId : callerId;
+        final roomId = data['roomId']?.toString() ?? '';
+        seenCallKeys.add('${otherUser}_$roomId');
         pastCalls.add([
           otherUser,
-          data['roomId']?.toString() ?? '',
+          roomId,
           startedAt is Timestamp
               ? DateFormat('EEEE ,d MMMM yyyy').format(startedAt.toDate())
               : '',
@@ -203,12 +208,37 @@ dynamic getUsers(currentuser) async {
       }
     }
   }
+
+  final communityFriends = await getCommunityFriendsForUser(currentuser);
+  final communityRoomId = await getCommunityRoomId();
+  for (final friend in communityFriends) {
+    final friendId = friend['friendId']?.toString() ?? '';
+    if (friendId.isEmpty) {
+      continue;
+    }
+
+    final callKey = '${friendId}_$communityRoomId';
+    if (seenCallKeys.contains(callKey)) {
+      continue;
+    }
+
+    pastCalls.add([
+      friendId,
+      communityRoomId,
+      '',
+      '',
+      '',
+      '',
+      'community',
+    ]);
+  }
+
   pastCalls.sort((a, b) => b[2].compareTo(a[2]));
 
   if (pastCalls.isEmpty) {
     pastCalls.add([
       'community',
-      'community',
+      communityRoomId,
       '',
       '',
       '',
@@ -259,6 +289,8 @@ Future<void> sendmessage(String receiverId, String message, currentid) async {
       .doc(chatroomId)
       .collection('messages')
       .add(newMessage.toMap());
+
+  await trimChatHistory(chatroomId);
 }
 
 // GET MESSAGES
@@ -350,6 +382,218 @@ dynamic getcommunityconstmessages(String userId, String title) async {
     print('No documents found in Firestore');
   }
   return listOfPeople;
+}
+
+String _communityFriendRequestId(
+    String communityId, String fromId, String toId) {
+  return '${communityId}_${fromId}_$toId';
+}
+
+String _communityFriendConnectionId(
+    String communityId, String userA, String userB) {
+  final ids = [userA, userB]..sort();
+  return '${communityId}_${ids.join('_')}';
+}
+
+String getDirectChatRoomId(String userA, String userB) {
+  final ids = [userA, userB]..sort();
+  return ids.join('_');
+}
+
+Future<String> getCommunityRoomId() async {
+  final firestore = FirebaseFirestore.instance;
+  final snapshot =
+      await firestore.collection('video_room_meta').doc('community').get();
+  final roomId = snapshot.data()?['roomId']?.toString();
+  if (roomId != null && roomId.isNotEmpty) {
+    return roomId;
+  }
+
+  final response = await http.post(
+    Uri.parse('https://api.videosdk.live/v2/rooms'),
+    headers: {
+      'Authorization':
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJlMjJjZTU3Zi0wZGZkLTQzYTQtYmRiNS02YTIxODcyYjY4YTkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTc3OTkxNzAwMywiZXhwIjoxNzgwNTIxODAzfQ.L6EDYBG6Xc0e4dUPMCTL6m7aX3sJRYQ2GU5SaDeVoNE'
+    },
+  );
+
+  if (response.statusCode >= 200 && response.statusCode < 300) {
+    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    final createdRoomId = decoded['roomId']?.toString();
+    if (createdRoomId != null && createdRoomId.isNotEmpty) {
+      await firestore.collection('video_room_meta').doc('community').set({
+        'roomId': createdRoomId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      return createdRoomId;
+    }
+  }
+
+  throw Exception('Unable to create community room');
+}
+
+Future<String> getCommunityFriendState(
+    String communityId, String currentUserId, String otherUserId) async {
+  final firestore = FirebaseFirestore.instance;
+  final connectionId =
+      _communityFriendConnectionId(communityId, currentUserId, otherUserId);
+  final connectionDoc =
+      await firestore.collection('community_friends').doc(connectionId).get();
+  if (connectionDoc.exists) {
+    return 'accepted';
+  }
+
+  final sentRequestId =
+      _communityFriendRequestId(communityId, currentUserId, otherUserId);
+  final receivedRequestId =
+      _communityFriendRequestId(communityId, otherUserId, currentUserId);
+
+  final sentRequest = await firestore
+      .collection('community_friend_requests')
+      .doc(sentRequestId)
+      .get();
+  if (sentRequest.exists) {
+    final status = sentRequest.data()?['status']?.toString() ?? 'pending';
+    return status == 'accepted' ? 'accepted' : 'pending_sent';
+  }
+
+  final receivedRequest = await firestore
+      .collection('community_friend_requests')
+      .doc(receivedRequestId)
+      .get();
+  if (receivedRequest.exists) {
+    final status = receivedRequest.data()?['status']?.toString() ?? 'pending';
+    return status == 'accepted' ? 'accepted' : 'pending_received';
+  }
+
+  return 'none';
+}
+
+Future<void> sendCommunityFriendRequest(
+    String communityId, String fromId, String toId) async {
+  final firestore = FirebaseFirestore.instance;
+  final requestId = _communityFriendRequestId(communityId, fromId, toId);
+
+  await firestore.collection('community_friend_requests').doc(requestId).set({
+    'communityId': communityId,
+    'fromId': fromId,
+    'toId': toId,
+    'status': 'pending',
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+}
+
+Future<void> acceptCommunityFriendRequest(
+    String communityId, String fromId, String toId) async {
+  final firestore = FirebaseFirestore.instance;
+  final requestId = _communityFriendRequestId(communityId, fromId, toId);
+  final connectionId = _communityFriendConnectionId(communityId, fromId, toId);
+
+  await firestore.collection('community_friend_requests').doc(requestId).set({
+    'communityId': communityId,
+    'fromId': fromId,
+    'toId': toId,
+    'status': 'accepted',
+    'updatedAt': FieldValue.serverTimestamp(),
+    'acceptedAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+
+  await firestore.collection('community_friends').doc(connectionId).set({
+    'communityId': communityId,
+    'members': [fromId, toId],
+    'createdAt': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+}
+
+Future<List<Map<String, dynamic>>> getPendingCommunityFriendRequests(
+    String currentUserId) async {
+  final firestore = FirebaseFirestore.instance;
+  final snapshot = await firestore
+      .collection('community_friend_requests')
+      .where('toId', isEqualTo: currentUserId)
+      .where('status', isEqualTo: 'pending')
+      .get();
+
+  final requests = snapshot.docs.map((doc) {
+    final data = doc.data();
+    return {
+      'requestId': doc.id,
+      'communityId': data['communityId']?.toString() ?? '',
+      'fromId': data['fromId']?.toString() ?? '',
+      'toId': data['toId']?.toString() ?? '',
+      'status': data['status']?.toString() ?? 'pending',
+      'createdAt': data['createdAt'],
+    };
+  }).toList();
+
+  requests.sort((a, b) {
+    final aTime = a['createdAt'] as Timestamp?;
+    final bTime = b['createdAt'] as Timestamp?;
+    if (aTime == null && bTime == null) return 0;
+    if (aTime == null) return 1;
+    if (bTime == null) return -1;
+    return bTime.compareTo(aTime);
+  });
+
+  return requests;
+}
+
+Future<List<Map<String, dynamic>>> getCommunityFriendsForUser(
+    String currentUserId) async {
+  final firestore = FirebaseFirestore.instance;
+  final snapshot = await firestore
+      .collection('community_friends')
+      .where('members', arrayContains: currentUserId)
+      .get();
+
+  final Map<String, Map<String, dynamic>> uniqueFriends = {};
+
+  for (final doc in snapshot.docs) {
+    final data = doc.data();
+    final members = List<String>.from(data['members'] ?? const []);
+    final friendId = members.firstWhere(
+      (member) => member != currentUserId,
+      orElse: () => '',
+    );
+
+    if (friendId.isEmpty) {
+      continue;
+    }
+
+    uniqueFriends[friendId] = {
+      'friendId': friendId,
+      'communityId': data['communityId']?.toString() ?? '',
+      'createdAt': data['createdAt'],
+    };
+  }
+
+  final friends = uniqueFriends.values.toList();
+  friends.sort((a, b) {
+    final aId = a['friendId']?.toString() ?? '';
+    final bId = b['friendId']?.toString() ?? '';
+    return aId.compareTo(bId);
+  });
+
+  return friends;
+}
+
+Future<void> trimChatHistory(String chatroomId, {int keep = 5}) async {
+  final firestore = FirebaseFirestore.instance;
+  final snapshot = await firestore
+      .collection('chat_rooms')
+      .doc(chatroomId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .get();
+
+  if (snapshot.docs.length <= keep) {
+    return;
+  }
+
+  for (final doc in snapshot.docs.skip(keep)) {
+    await doc.reference.delete();
+  }
 }
 
 // ADD FINAL STRESS VALUE
