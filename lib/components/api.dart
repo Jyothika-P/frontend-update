@@ -12,11 +12,13 @@ class BookItem {
   final String title;
   final String description;
   final List<BookThumbnail> imageLinks;
+  final String previewLink;
 
   BookItem({
     required this.title,
     required this.description,
     required this.imageLinks,
+    required this.previewLink,
   });
 }
 
@@ -63,12 +65,17 @@ Future<dynamic> buildAPI() async {
             final imageLinks =
                 volumeInfo['imageLinks'] as Map<String, dynamic>?;
             final thumbnail = imageLinks?['thumbnail']?.toString() ?? '';
+            final previewLink =
+                volumeInfo['previewLink']?.toString() ??
+                    volumeInfo['infoLink']?.toString() ??
+                    '';
 
             return BookItem(
               title: title,
               description: description,
               imageLinks:
                   thumbnail.isNotEmpty ? [BookThumbnail(thumbnail)] : [],
+              previewLink: previewLink,
             );
           })
           .where((book) => book.title.isNotEmpty && book.imageLinks.isNotEmpty)
@@ -84,51 +91,87 @@ Future<dynamic> buildAPI() async {
   final searchUri = Uri.parse(
     'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=powerful+leaders+speeches+ted+talks&safeSearch=strict&key=$youtubeApiKey',
   );
-  final searchResponse = await http.get(searchUri);
-  final searchJson = jsonDecode(searchResponse.body) as Map<String, dynamic>;
-  final searchItems = (searchJson['items'] as List? ?? []);
-  final videoIds = searchItems
+
+  List<dynamic> searchItems = [];
+  try {
+    final searchResponse = await http.get(searchUri);
+    final searchJson = jsonDecode(searchResponse.body) as Map<String, dynamic>;
+
+    if (searchResponse.statusCode == 200) {
+      searchItems = (searchJson['items'] as List? ?? []);
+    } else {
+      final errorMessage =
+          (searchJson['error'] is Map &&
+                  searchJson['error']['message'] != null)
+              ? searchJson['error']['message'].toString()
+              : 'Unknown YouTube API error';
+      print(
+          'YouTube search failed (${searchResponse.statusCode}): $errorMessage');
+    }
+  } catch (e) {
+    print('YouTube search request failed: $e');
+  }
+
+  List<String> videoIds = searchItems
       .map((item) => item['id']?['videoId'] as String?)
       .whereType<String>()
       .toList();
 
-  final statisticsById = <String, String>{};
-  if (videoIds.isNotEmpty) {
-    final statisticsUri = Uri.parse(
-      'https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(',')}&key=$youtubeApiKey',
-    );
-    final statisticsResponse = await http.get(statisticsUri);
-    final statisticsJson =
-        jsonDecode(statisticsResponse.body) as Map<String, dynamic>;
-    for (final item in (statisticsJson['items'] as List? ?? [])) {
-      final id = item['id'] as String?;
-      final views = item['statistics']?['viewCount']?.toString() ?? '0';
-      if (id != null) {
-        statisticsById[id] = views;
-      }
-    }
+  // Fallback to curated IDs when search is blocked/quota-exhausted.
+  if (videoIds.isEmpty) {
+    videoIds = [
+      'w-HYZv6HzAs', // Simon Sinek: Start with Why
+      'mgmVOuLgFB0', // Angela Lee Duckworth: Grit
+      'UNQhuFL6CWg', // Amy Cuddy: Body language
+      'fLJsdqxnZb0', // Carol Dweck: Growth mindset
+      'iCvmsMzlF7o', // Tim Urban: Procrastination
+    ];
   }
 
-  final List<YoutubeVideoItem> listVideo = searchItems
-      .whereType<Map>()
-      .map((item) {
-        final snippet = item['snippet'] as Map<String, dynamic>? ?? {};
-        final id = item['id']?['videoId'] as String? ?? '';
-        final thumbnailUrl =
-            snippet['thumbnails']?['high']?['url']?.toString() ??
-                snippet['thumbnails']?['medium']?['url']?.toString() ??
-                snippet['thumbnails']?['default']?['url']?.toString() ??
-                '';
-        return YoutubeVideoItem(
-          title: snippet['title']?.toString() ?? '',
-          views: statisticsById[id] ?? '0',
-          thumbnails: [YoutubeThumbnail(thumbnailUrl)],
-          videoId: id,
-        );
-      })
-      .where((video) =>
-          video.title.isNotEmpty && video.thumbnails.first.url.isNotEmpty)
-      .toList();
+  final videosUri = Uri.parse(
+    'https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoIds.join(',')}&key=$youtubeApiKey',
+  );
+
+  List<YoutubeVideoItem> listVideo = [];
+  try {
+    final videosResponse = await http.get(videosUri);
+    final videosJson = jsonDecode(videosResponse.body) as Map<String, dynamic>;
+
+    if (videosResponse.statusCode == 200) {
+      listVideo = (videosJson['items'] as List? ?? [])
+          .whereType<Map>()
+          .map((item) {
+            final snippet = item['snippet'] as Map<String, dynamic>? ?? {};
+            final statistics = item['statistics'] as Map<String, dynamic>? ?? {};
+            final id = item['id']?.toString() ?? '';
+            final thumbnailUrl =
+                snippet['thumbnails']?['high']?['url']?.toString() ??
+                    snippet['thumbnails']?['medium']?['url']?.toString() ??
+                    snippet['thumbnails']?['default']?['url']?.toString() ??
+                    '';
+
+            return YoutubeVideoItem(
+              title: snippet['title']?.toString() ?? '',
+              views: statistics['viewCount']?.toString() ?? '0',
+              thumbnails: [YoutubeThumbnail(thumbnailUrl)],
+              videoId: id,
+            );
+          })
+          .where((video) =>
+              video.title.isNotEmpty &&
+              video.videoId.isNotEmpty &&
+              video.thumbnails.first.url.isNotEmpty)
+          .toList();
+    } else {
+      final errorMessage =
+          (videosJson['error'] is Map && videosJson['error']['message'] != null)
+              ? videosJson['error']['message'].toString()
+              : 'Unknown YouTube API error';
+      print('YouTube videos failed (${videosResponse.statusCode}): $errorMessage');
+    }
+  } catch (e) {
+    print('YouTube videos request failed: $e');
+  }
 
   if (listVideo.length == 0) print("null");
   return [filteredList, listVideo];

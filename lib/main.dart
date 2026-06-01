@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:psychesail/model/places.dart';
@@ -87,6 +88,17 @@ void main() async {
   }
   ;
 
+  // Schedule a debug notification 20s after app start (debug only)
+  if (kDebugMode) {
+    await NotificationsFirebase.showScheduledNotification(
+      title: 'Welcome back — quick mood check',
+      body:
+          'Tap to login and record your mood for today — a quick check-in helps you track progress!',
+      payload: '{"scheduled":true}',
+      delaySeconds: 20,
+    );
+  }
+
   runApp(MyApp());
 }
 
@@ -103,12 +115,14 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         builder: (context, child) {
           final mediaQuery = MediaQuery.of(context);
-          return MediaQuery(
+          final Widget appChild = MediaQuery(
             data: mediaQuery.copyWith(
               textScaler: const TextScaler.linear(_globalTextScale),
             ),
             child: child ?? const SizedBox.shrink(),
           );
+
+          return appChild;
         },
         navigatorObservers: [routeObserver],
         title: 'Serenova',

@@ -108,24 +108,110 @@ dynamic updateChat(currentUser, receiveUser, message) {
   }, SetOptions(merge: true));
 }
 
+DateTime _chatThreadSortKey(Map<String, dynamic> metadata) {
+  final date = metadata['date']?.toString() ?? '';
+  final time = metadata['time']?.toString() ?? '';
+
+  try {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').parse('$date $time');
+  } catch (_) {
+    return DateTime.fromMillisecondsSinceEpoch(0);
+  }
+}
+
+Future<Map<String, dynamic>?> _loadLatestDirectChatMetadata(
+    String currentUserId, String otherUserId) async {
+  final firestore = FirebaseFirestore.instance;
+  final roomId = getDirectChatRoomId(currentUserId, otherUserId);
+  final snapshot = await firestore
+      .collection('chat_rooms')
+      .doc(roomId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .limit(1)
+      .get();
+
+  if (snapshot.docs.isEmpty) {
+    return null;
+  }
+
+  final data = snapshot.docs.first.data();
+  final timestamp = data['timestamp'];
+  final chatTime = timestamp is Timestamp ? timestamp.toDate() : DateTime.now();
+  final message = data['message']?.toString() ?? '';
+
+  if (message.isEmpty && timestamp is! Timestamp) {
+    return null;
+  }
+
+  return {
+    'message': message,
+    'date': dateFormatter.format(chatTime),
+    'time': timeFormatter.format(chatTime),
+  };
+}
+
 dynamic getUsers(currentuser) async {
+  if (currentuser == null || (currentuser is String && currentuser.isEmpty)) {
+    // Return empty/default structure to avoid runtime errors when no user id is provided
+    return [[], [], [], [], [], []];
+  }
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   dynamic userentries =
       await _firestore.collection('chatAvailable').doc('$currentuser').get();
   print("hello");
   print(userentries.runtimeType);
-  dynamic user = userentries
-      .data()
-      .entries
-      .map((entry) => [entry.key, entry.value])
-      .toList();
+  final userData = (userentries.data() as Map<String, dynamic>?) ?? {};
+  dynamic user =
+      userData.entries.map((entry) => [entry.key, entry.value]).toList();
   int serenityIndex = 0;
   for (var it = 0; it < user.length; it++) {
     if (user[it][0] == 'Serenity') serenityIndex = it;
   }
-  var temp = user[0];
-  user[0] = user[serenityIndex];
-  user[serenityIndex] = temp;
+
+  final mergedChats = <String, Map<String, dynamic>>{};
+  for (final chat in user) {
+    final chatId = chat[0].toString();
+    final metadata = chat.length > 1 && chat[1] is Map
+        ? Map<String, dynamic>.from(chat[1] as Map)
+        : <String, dynamic>{};
+    mergedChats[chatId] = metadata;
+  }
+
+  final communityFriends = await getCommunityFriendsForUser(currentuser);
+  for (final friend in communityFriends) {
+    final friendId = friend['friendId']?.toString() ?? '';
+    if (friendId.isEmpty) {
+      continue;
+    }
+
+    final latestMetadata =
+        await _loadLatestDirectChatMetadata(currentuser, friendId);
+    if (latestMetadata != null) {
+      mergedChats[friendId] = latestMetadata;
+    }
+  }
+
+  user = mergedChats.entries.map((entry) => [entry.key, entry.value]).toList();
+  user.sort((a, b) {
+    final bMetadata = b.length > 1 && b[1] is Map
+        ? Map<String, dynamic>.from(b[1] as Map)
+        : <String, dynamic>{};
+    final aMetadata = a.length > 1 && a[1] is Map
+        ? Map<String, dynamic>.from(a[1] as Map)
+        : <String, dynamic>{};
+    return _chatThreadSortKey(bMetadata)
+        .compareTo(_chatThreadSortKey(aMetadata));
+  });
+
+  serenityIndex =
+      user.indexWhere((chat) => chat.isNotEmpty && chat[0] == 'Serenity');
+  if (serenityIndex > 0) {
+    final temp = user[0];
+    user[0] = user[serenityIndex];
+    user[serenityIndex] = temp;
+  }
+
   print(user);
   dynamic community = await _firestore.collection('community').get();
   print(community.docs[1]['description']);
@@ -209,7 +295,6 @@ dynamic getUsers(currentuser) async {
     }
   }
 
-  final communityFriends = await getCommunityFriendsForUser(currentuser);
   final communityRoomId = await getCommunityRoomId();
   for (final friend in communityFriends) {
     final friendId = friend['friendId']?.toString() ?? '';

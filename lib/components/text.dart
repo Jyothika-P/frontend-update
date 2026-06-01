@@ -333,6 +333,11 @@ Widget bookContainer(sizeWidth, sizeHeight, constr, heading, description,
     imagestring, previewstring) {
   print("inside container");
   print(description.length);
+  final previewUrl =
+      (previewstring is String ? previewstring : previewstring?.toString())
+              ?.trim() ??
+          '';
+  final hasValidPreviewUrl = previewUrl.isNotEmpty;
   return Container(
     constraints: BoxConstraints(maxWidth: sizeWidth * 0.95),
     decoration: BoxDecoration(
@@ -388,12 +393,19 @@ Widget bookContainer(sizeWidth, sizeHeight, constr, heading, description,
               height: min(12, sizeHeight * 0.05),
             ),
             InkWell(
-                onTap: () => _launchUrl(previewstring),
-                child: const Text(
+                onTap: hasValidPreviewUrl
+                    ? () {
+                        final uri = Uri.tryParse(previewUrl);
+                        _launchUrl(uri);
+                      }
+                    : null,
+                child: Text(
                   'Preview the recommended book',
                   style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
+                    color: hasValidPreviewUrl ? Colors.blue : Colors.grey,
+                    decoration: hasValidPreviewUrl
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
                   ),
                 ))
           ],
@@ -724,6 +736,8 @@ Future<dynamic> searchNearbyPlaces(
 
 Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
     imagestring, bordercolor) {
+  final hasValidLocationUrl =
+      googlemapsuri is String && googlemapsuri.trim().isNotEmpty;
   return Container(
     constraints: BoxConstraints(maxWidth: sizeWidth * 0.8),
     decoration: BoxDecoration(
@@ -745,12 +759,19 @@ Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
                 fontWeight: FontWeight.bold),
           ),
           InkWell(
-              onTap: () => _launchUrl(Uri.parse(googlemapsuri)),
-              child: const Text(
+              onTap: hasValidLocationUrl
+                  ? () {
+                      final uri = Uri.tryParse(googlemapsuri.toString());
+                      _launchUrl(uri);
+                    }
+                  : null,
+              child: Text(
                 'Open Location',
                 style: TextStyle(
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
+                  color: hasValidLocationUrl ? Colors.blue : Colors.grey,
+                  decoration: hasValidLocationUrl
+                      ? TextDecoration.underline
+                      : TextDecoration.none,
                 ),
               ))
         ],
@@ -759,13 +780,62 @@ Widget communitycontainer(sizeWidth, sizeHeight, constr, heading, googlemapsuri,
   );
 }
 
-Future<void> _launchUrl(Uri _url) async {
-  if (!await launchUrl(_url)) {
-    throw Exception('Could not launch $_url');
+Future<void> _launchUrl(Uri? url) async {
+  if (url == null || url.toString().trim().isEmpty) {
+    debugPrint('Skipped launching empty URL');
+    return;
   }
+
+  Uri launchableUrl = url;
+  if (!launchableUrl.hasScheme) {
+    launchableUrl = Uri.parse('https://${launchableUrl.toString()}');
+  }
+
+  if (!await canLaunchUrl(launchableUrl)) {
+    debugPrint('No app can handle URL: $launchableUrl');
+    return;
+  }
+
+  await launchUrl(launchableUrl, mode: LaunchMode.externalApplication);
 }
 
 format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+
+String _buildPlaceUrl(Map item) {
+  final directUrl = item['googleMapsUri'];
+  if (directUrl is String && directUrl.trim().isNotEmpty) {
+    return directUrl.trim();
+  }
+
+  final properties = item['properties'];
+  if (properties is Map) {
+    final osmUrl = properties['osm_url'];
+    if (osmUrl is String && osmUrl.trim().isNotEmpty) {
+      return osmUrl.trim();
+    }
+
+    final lat = properties['lat'];
+    final lon = properties['lon'];
+    if (lat != null && lon != null) {
+      return 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+    }
+  }
+
+  final geometry = item['geometry'];
+  if (geometry is Map) {
+    final coordinates = geometry['coordinates'];
+    if (coordinates is List && coordinates.length >= 2) {
+      final lon = coordinates[0];
+      final lat = coordinates[1];
+      if (lat != null && lon != null) {
+        return 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+      }
+    }
+  }
+
+  return '';
+}
+
 Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
     {Color bordercolor = Colors.grey}) {
   final dynamic placeList =
@@ -801,16 +871,7 @@ Widget activitymaps(sizeWidth, sizeHeight, constr, places, imagestring,
                             item['properties'].containsKey('formatted'))
                         ? item['properties']['formatted']
                         : 'Unknown Place';
-            final googleMapsUri = item.containsKey('googleMapsUri')
-                ? item['googleMapsUri']
-                : (item['properties'] is Map &&
-                        item['properties'].containsKey('osm_url'))
-                    ? item['properties']['osm_url']
-                    : (item['properties'] is Map &&
-                            item['properties'].containsKey('lat') &&
-                            item['properties'].containsKey('lon'))
-                        ? 'https://www.google.com/maps/search/?api=1&query=${item['properties']['lat']},${item['properties']['lon']}'
-                        : '';
+            final googleMapsUri = _buildPlaceUrl(item);
             return communitycontainer(
                 sizeWidth,
                 sizeHeight,

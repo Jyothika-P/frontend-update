@@ -167,14 +167,15 @@ class NotificationsFirebase {
   static Future showScheduledNotification(
       {required String title,
       required String body,
-      required String payload}) async {
+      required String payload,
+      int delaySeconds = 30}) async {
     tz.initializeTimeZones();
     var localtime = tz.local;
     await _flutterLocalNotificationsPlugin.zonedSchedule(
         0,
-        'scheduled title',
-        'scheduled body',
-        tz.TZDateTime.now(localtime).add(const Duration(seconds: 30)),
+        title,
+        body,
+        tz.TZDateTime.now(localtime).add(Duration(seconds: delaySeconds)),
         const NotificationDetails(
             android: AndroidNotificationDetails(
                 'your channel id', 'your channel name',

@@ -157,7 +157,7 @@ Widget bookscroll(
                 arr[arr.length - 1 - index].imageLinks.isNotEmpty
                     ? arr[arr.length - 1 - index].imageLinks.first.url
                     : '',
-                '');
+              arr[arr.length - 1 - index].previewLink);
           },
           separatorBuilder: ((context, index) => SizedBox(
                 width: min(sizeWidth * 0.05, 30),

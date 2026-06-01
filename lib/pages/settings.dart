@@ -383,29 +383,32 @@ class _SettingState extends State<Setting> {
             ),
           ),
           bottomNavigationBar: BottomNavigationBar(
+            currentIndex: 3,
+            onTap: (int index) {
+              final currentUserId = _currentUserId();
+              if (index >= 0 && index <= 2) {
+                Navigator.pop(context, index);
+              }
+              // index == 3 -> already on Settings
+            },
             unselectedItemColor: const Color.fromRGBO(35, 154, 139, 75),
             fixedColor: const Color.fromRGBO(35, 154, 139, 75),
             backgroundColor: Colors.white,
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.message,
-                  color: Color.fromRGBO(35, 154, 139, 75),
-                ),
-                label: 'Message',
+                icon: Icon(Icons.message),
+                label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.call,
-                  color: Color.fromRGBO(35, 154, 139, 75),
-                ),
+                icon: Icon(Icons.chat_bubble_outline),
+                label: 'Chats',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.call),
                 label: 'Calls',
               ),
               BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
-                  color: Color.fromRGBO(35, 154, 139, 75),
-                ),
+                icon: Icon(Icons.settings),
                 label: 'Settings',
               ),
             ],
