@@ -299,8 +299,11 @@ class _ChatRoomState extends State<ChatRoom> {
     communityname = args?['communityname'] ?? 'community';
     currentid = args?['currentid'] ?? '';
     receiverid =
-        args?['receiverid'] ?? ((currentid == 'Joe') ? 'Disha' : 'Joe');
-    chatmode = args?['chatmode'] ?? 'community';
+      args?['receiverid'] ?? ((currentid == 'Joe') ? 'Disha' : 'Joe');
+    final dynamic communityArg = args?['communityname'];
+    final bool hasCommunityTarget =
+      communityArg is String ? communityArg.isNotEmpty : communityArg != null;
+    chatmode = args?['chatmode'] ?? (hasCommunityTarget ? 'community' : 'private');
     chatroomId =
         args?['chatroomId'] ?? getDirectChatRoomId(currentid, receiverid);
     var name = args?['name'] ?? "Exams";

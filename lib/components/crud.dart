@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:psychesail/model/message.dart';
+import 'package:psychesail/model/supportcontactsmodel.dart';
 import 'package:psychesail/model/time.dart';
 
 final dateFormatter = DateFormat('yyyy-MM-dd');
@@ -784,4 +785,69 @@ Future<void> completeCallHistory(String roomId) async {
     },
     SetOptions(merge: true),
   );
+}
+
+class SupportCircleRepo {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<void> addContact(
+    String customerId,
+    SupportContact contact,
+  ) async {
+    final contactId = contact.id.isNotEmpty
+        ? contact.id
+        : firestore
+            .collection('customers')
+            .doc(customerId)
+            .collection('supportCircle')
+            .doc()
+            .id;
+
+    await firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection('supportCircle')
+        .doc(contactId)
+        .set(contact.toMap());
+  }
+
+  Future<void> updateContact(
+    String customerId,
+    SupportContact contact,
+  ) async {
+    await firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection('supportCircle')
+        .doc(contact.id)
+        .set(contact.toMap(), SetOptions(merge: true));
+  }
+
+  Stream<List<SupportContact>> getContacts(
+    String customerId,
+  ) {
+    return firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection('supportCircle')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => SupportContact.fromMap(
+                  doc.id,
+                  doc.data(),
+                ))
+            .toList());
+  }
+
+  Future<void> deleteContact(
+    String customerId,
+    String contactId,
+  ) async {
+    await firestore
+        .collection('customers')
+        .doc(customerId)
+        .collection('supportCircle')
+        .doc(contactId)
+        .delete();
+  }
 }

@@ -2,27 +2,19 @@ import 'dart:math';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:provider/provider.dart';
 import 'package:psychesail/bloc/chat_bloc.dart';
 import 'package:psychesail/bloc/chat_state.dart';
-import 'package:psychesail/components/api.dart';
+import 'package:psychesail/components/sos_bottom_sheet.dart';
 import 'package:psychesail/model/botchatmessagemodel.dart';
-import 'package:psychesail/model/places.dart';
-import 'package:psychesail/model/textField.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:psychesail/components/crud.dart';
 import 'package:psychesail/components/text.dart';
-import 'package:psychesail/model/message.dart';
-import 'package:random_avatar/random_avatar.dart';
+import 'package:psychesail/model/supportcontactsmodel.dart';
 import 'package:psychesail/model/emoji.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../components/button.dart';
 import '../main.dart';
@@ -39,6 +31,7 @@ class MonkeyBotChatRoom extends StatefulWidget {
 class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
   final TextEditingController _messageController = TextEditingController();
   final ChatBloc chatbloc = ChatBloc();
+  final SupportCircleRepo _supportCircleRepo = SupportCircleRepo();
   List<String> userinputs = [];
   List<List<String>> arr = [
     ["Parks", "assets/park.png"],
@@ -55,7 +48,73 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
   var stressScore = '0';
   var obj = {};
   var url = '';
+  bool _supportCallPromptArmed = false;
+  bool _supportCallPopupOpen = false;
   FlutterTts flutterTts = FlutterTts();
+
+  bool _looksDistressed(String text) {
+    final normalized = text.toLowerCase();
+    const distressKeywords = [
+      'depressed',
+      'alone',
+      'lonely',
+      'overwhelmed',
+      'panic',
+      'panicking',
+      'nobody understands',
+      'nobody gets me',
+      'need someone',
+      'need human',
+      'can’t cope',
+      "can't cope",
+      'dont want to be alone',
+      'do not want to be alone',
+      'feel empty',
+      'feel lost',
+    ];
+
+    return distressKeywords.any(normalized.contains);
+  }
+
+  bool _isNegativeAboutCalling(String text) {
+    final normalized = text.toLowerCase().trim();
+    const negativeSignals = [
+      'no',
+      'not now',
+      'later',
+      'maybe later',
+      'dont',
+      'do not',
+      'not really',
+      'leave it',
+    ];
+
+    return negativeSignals.any(normalized.contains);
+  }
+
+  bool _assistantOfferedSupport(String text) {
+    final normalized = text.toLowerCase();
+    return normalized.contains('support circle') ||
+        normalized.contains('call or message someone') ||
+        normalized.contains('reach out to someone') ||
+        normalized.contains('trusted person');
+  }
+
+  Future<List<SupportContact>> _loadSupportContacts() async {
+    final contacts = await _supportCircleRepo.getContacts(currentid).first;
+    return contacts;
+  }
+
+  Future<void> _showCallPopup() async {
+    final contacts = await _supportCircleRepo.getContacts(currentid).first;
+    print("CURRENT USER ID = $currentid");
+    print("CONTACTS FOUND = ${contacts.length}");
+    await showSOSSheet(
+      context,
+      contacts,
+    );
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -119,6 +178,15 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
         setState(() {
           stressScore = stress_score;
         });
+        final score = double.tryParse(stress_score) ?? 0;
+
+        if (score >= 8) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _showSupportSuggestion();
+            }
+          });
+        }
         addStressValue(currentid, stressScore);
       } else {
         print('Failed to send data. Status code: ${response.statusCode}');
@@ -150,6 +218,190 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     await flutterTts.speak(text);
   }
 
+  Future<void> _showSupportSuggestion() async {
+    if (_supportCallPopupOpen) return;
+
+    await showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("Need Support?"),
+          content: Text(
+            "It sounds like you're having a difficult time. Would you like to contact someone from your Support Circle?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Not Now"),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                await _showCallPopup();
+              },
+              child: Text("Contact Someone"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  bool _isPositiveAboutCalling(String text) {
+    final normalized = text.toLowerCase().trim();
+
+    const positiveSignals = [
+      'yes',
+      'yeah',
+      'yep',
+      'sure',
+      'ok',
+      'okay',
+      'please',
+      'call',
+      'message',
+      'text them',
+      'do it',
+      'lets call',
+      'i want to call',
+      'i want to message',
+    ];
+
+    return positiveSignals.any(
+      (signal) => normalized.contains(signal),
+    );
+  }
+
+  // dynamic sendMessage(messages, String userText) async {
+  //   print("MESSAGE CONTROLLER = ${_messageController.text}");
+  //   print("Entered send messages");
+  //   if (_messageController.text.isNotEmpty) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     setState(() {
+  //       userinputs.add(userText);
+  //     });
+  //     print(userinputs);
+  //     var inputMessage = userText;
+  //     _messageController.clear();
+
+  //     if (_supportCallPromptArmed) {
+  //       if (_isPositiveAboutCalling(userText)) {
+  //         _supportCallPromptArmed = false;
+  //         WidgetsBinding.instance.addPostFrameCallback((_) {
+  //           _showCallPopup();
+  //         });
+  //       } else if (_isNegativeAboutCalling(userText)) {
+  //         _supportCallPromptArmed = false;
+  //       }
+  //     }
+
+  //     await sendmessage(receiverid, inputMessage, currentid);
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //     updateChat(currentid, receiverid,
+  //         messages[messages.length - 1].parts.first.text);
+
+  //     if (_looksDistressed(userText)) {
+  //       print("DISTRESS DETECTED");
+  //       await _showCallPopup();
+  //       // showDialog(
+  //       //   context: context,
+  //       //   builder: (_) {
+  //       //     return AlertDialog(
+  //       //       title: Text("TEST"),
+  //       //       content: Text("Distress detected"),
+  //       //     );
+  //       //   },
+  //       // );
+  //       // WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       //   if (mounted) {
+  //       //     _showSupportSuggestion();
+  //       //   }
+  //       // });
+  //     }
+
+  //     if (_assistantOfferedSupport(
+  //         messages[messages.length - 1].parts.first.text)) {
+  //       _supportCallPromptArmed = true;
+  //     }
+
+  //     return;
+  //   }
+  //   return;
+  // }
+
+  dynamic sendMessage(messages, String userText) async {
+    print("Entered send messages");
+    print("USER TEXT = $userText");
+
+    if (userText.trim().isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    userinputs.add(userText);
+
+    print(userinputs);
+
+    final inputMessage = userText;
+
+    if (_supportCallPromptArmed) {
+      if (_isPositiveAboutCalling(userText)) {
+        _supportCallPromptArmed = false;
+
+        if (mounted) {
+          await _showCallPopup();
+        }
+
+        return;
+      } else if (_isNegativeAboutCalling(userText)) {
+        _supportCallPromptArmed = false;
+      }
+    }
+
+    await sendmessage(
+      receiverid,
+      inputMessage,
+      currentid,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (messages.isNotEmpty) {
+      updateChat(
+        currentid,
+        receiverid,
+        messages.last.parts.first.text,
+      );
+    }
+
+    if (_looksDistressed(userText)) {
+      print("DISTRESS DETECTED");
+
+      if (mounted) {
+        await _showCallPopup();
+      }
+    }
+
+    if (messages.isNotEmpty &&
+        _assistantOfferedSupport(
+          messages.last.parts.first.text,
+        )) {
+      _supportCallPromptArmed = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args =
@@ -166,6 +418,10 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     print(receiverid);
     print(lastmessage);
     print(currentid);
+
+    if (_assistantOfferedSupport(lastmessage)) {
+      _supportCallPromptArmed = true;
+    }
 
     // Future<void> _fetchStressScore(userinputs) async {
     //   var url = Uri.parse('http://127.0.0.1:8000/process_data');
@@ -207,31 +463,6 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
     //     print("Error sending data: $e");
     //   }
     // }
-
-    dynamic sendMessage(messages) async {
-      print("Entered send messages");
-      if (_messageController.text.isNotEmpty) {
-        setState(() {
-          _isLoading = true;
-        });
-        setState(() {
-          userinputs.add(_messageController.text);
-        });
-        print(userinputs);
-        var inputMessage = _messageController.text;
-        _messageController.clear();
-        await sendmessage(receiverid, inputMessage, currentid);
-        setState(() {
-          _isLoading = false;
-        });
-        updateChat(currentid, receiverid,
-            messages[messages.length - 1].parts.first.text);
-        return;
-      }
-      return;
-    }
-
-    // print(hello)
 
     return Scaffold(
         appBar: AppBar(
@@ -747,7 +978,8 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                               userinputs.add(userInput);
                                             });
 
-                                            await sendMessage(messages);
+                                            await sendMessage(
+                                                messages, userInput);
                                             await textToSpeech(
                                                 messages[messages.length - 1]
                                                     .parts
@@ -888,7 +1120,8 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
                                             setState(() {
                                               _isLoading = false;
                                             });
-                                            await sendMessage(messages);
+                                            await sendMessage(
+                                                messages, userInput);
                                             await textToSpeech(
                                                 messages[messages.length - 1]
                                                     .parts
@@ -989,46 +1222,6 @@ class _MonkeyBotChatRoomState extends State<MonkeyBotChatRoom> with RouteAware {
 //         );
 //       });
 // }
-
-Widget _buildMessageItem(DocumentSnapshot document, currentid) {
-  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-  // align sender messages => left ; receiver messages => right
-
-  var alignment = (data['senderid'] == currentid)
-      ? Alignment.centerRight
-      : Alignment.centerLeft;
-  var bgcolor = (data['senderid'] == currentid)
-      ? Color.fromRGBO(32, 160, 144, 100)
-      : Color.fromRGBO(121, 124, 123, 100);
-  return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-    bool constr = false;
-    if (constraints.maxWidth > 600) constr = true;
-    return Container(
-      alignment: alignment,
-      child: Column(
-        crossAxisAlignment: (data['senderid'] == currentid)
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
-        mainAxisAlignment: (data['senderid'] == currentid)
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-        children: [
-          // Text(data['senderid'],style: const TextStyle(backgroundColor: Colors.transparent,color: Colors.black,fontSize: 15,),),
-          textbubble(
-              data['message'],
-              '${data['timestamp'].toDate().toLocal().hour}:' +
-                  '${data['timestamp'].toDate().toLocal().minute.toString().padLeft(2, '0')}',
-              data['senderid'],
-              currentid,
-              bgcolor,
-              constr,
-              context),
-        ],
-      ),
-    );
-  });
-}
 
 Widget _endchat(
     stressScore, sizeWidth, sizeHeight, currentid, context, messages) {

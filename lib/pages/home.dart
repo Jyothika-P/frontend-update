@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:psychesail/components/activity_widget.dart';
 import 'package:psychesail/components/api.dart';
 import 'package:psychesail/components/crud.dart';
+import 'package:psychesail/components/sos_bottom_sheet.dart';
 import 'package:psychesail/components/text.dart';
 import 'package:psychesail/components/vertical_scroll.dart';
 import 'package:psychesail/model/places.dart';
+import 'package:psychesail/model/supportcontactsmodel.dart';
 import 'package:psychesail/pages/chats.dart';
 import 'package:psychesail/pages/past_calls.dart';
 import 'package:random_avatar/random_avatar.dart';
@@ -47,6 +50,7 @@ class _homeState extends State<home> {
   bool flag = true;
   int _selectedTab = 0;
   late Future<Position> _currentPositionFuture;
+  final SupportCircleRepo _supportCircleRepo = SupportCircleRepo();
 
   @override
   void initState() {
@@ -170,6 +174,8 @@ class _homeState extends State<home> {
     Navigator.pushNamed(context, '/chatroom', arguments: {
       'receiverid': receiverId,
       'currentid': currentUserId,
+      'chatmode': 'private',
+      'chatroomId': getDirectChatRoomId(currentUserId, receiverId),
       'receiveremail': 'gaand_maarao',
     });
   }
@@ -222,6 +228,21 @@ class _homeState extends State<home> {
           if (locationSnapshot.hasError) {
             print('Location fetch failed: ${locationSnapshot.error}');
           }
+          Future<List<SupportContact>> _getSupportContacts(
+              String currentUserId) async {
+            final snapshot = await FirebaseFirestore.instance
+                .collection('customers')
+                .doc(currentUserId)
+                .collection('supportCircle')
+                .get();
+
+            return snapshot.docs.map((doc) {
+              return SupportContact.fromMap(
+                doc.id,
+                doc.data(),
+              );
+            }).toList();
+          }
 
           return LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
@@ -237,11 +258,37 @@ class _homeState extends State<home> {
                     Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: sizeWidth / 20),
-                        child: RandomAvatar(
-                          currentUserId,
-                          trBackground: false,
-                          height: 50,
-                          width: 50,
+                        child: GestureDetector(
+                          onDoubleTap: () async {
+                            final contacts = await _supportCircleRepo
+                                .getContacts(currentUserId)
+                                .first;
+
+                            if (!mounted) return;
+
+                            await showSOSSheet(
+                              context,
+                              contacts,
+                            );
+                          },
+                          onLongPress: () async {
+                            final contacts = await _supportCircleRepo
+                                .getContacts(currentUserId)
+                                .first;
+
+                            if (!mounted) return;
+
+                            await showSOSSheet(
+                              context,
+                              contacts,
+                            );
+                          },
+                          child: RandomAvatar(
+                            currentUserId,
+                            trBackground: false,
+                            height: 50,
+                            width: 50,
+                          ),
                         )),
                   ],
                 ),

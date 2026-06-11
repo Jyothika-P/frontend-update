@@ -54,7 +54,6 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
-  Gemini.init(apiKey: 'AIzaSyBVOgf5N_kO5_BdX7lZ-DDCRv7bRzYSOOs');
 
   await NotificationsFirebase.init();
   await NotificationsFirebase.localNotiInit();

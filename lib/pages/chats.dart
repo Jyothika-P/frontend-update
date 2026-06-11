@@ -75,6 +75,8 @@ class ChatsContent extends StatelessWidget {
     Navigator.pushNamed(context, '/chatroom', arguments: {
       'receiverid': receiverId,
       'currentid': currentUserId,
+      'chatmode': 'private',
+      'chatroomId': getDirectChatRoomId(currentUserId, receiverId),
       'receiveremail': 'gaand_maarao',
     });
   }
